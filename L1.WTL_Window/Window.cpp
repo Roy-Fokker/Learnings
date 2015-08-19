@@ -6,8 +6,10 @@ using namespace Learnings;
 // ATL Window stuff
 LRESULT Window::OnClose(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 {
-	// TODO: Do Callback, ask Application if it's okay to destroy window
-	bHandled = DestroyWindow();
+	if (m_Callback(Message::Close, 0, 0))
+	{
+		bHandled = DestroyWindow();
+	}
 
 	return 0;
 }
@@ -35,10 +37,12 @@ LRESULT Window::OnActivate(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandle
 	if (wParam)
 	{
 		m_IsActive = true;
+		m_Callback(Message::Activate, 0, 0);
 	}
 	else
 	{
 		m_IsActive = false;
+		m_Callback(Message::Deactivate, 0, 0);
 	}
 
 	// TODO: Do Callback, let application know
@@ -59,12 +63,13 @@ LRESULT Window::OnResize(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 			case SIZE_MINIMIZED:
 				break;
 			case SIZE_MAXIMIZED:
+				m_Callback(Message::Maximized, w, h);
 				break;
 			case SIZE_RESTORED:
+			default:
+				m_Callback(Message::Resized, w, h);
 				break;
 		}
-
-		// TODO: Do Callback, let application know
 	}
 
 	bHandled = TRUE;
@@ -79,13 +84,13 @@ LRESULT Window::OnSizing(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 		{
 			case WM_ENTERSIZEMOVE:
 				m_IsResizing = true;
+				m_Callback(Message::Pause, 0, 0);
 				break;
 			case WM_EXITSIZEMOVE:
 				m_IsResizing = false;
+				m_Callback(Message::Resume, 0, 0);
 				break;
 		}
-
-		// TODO: Do Callback, let application know
 	}
 
 	bHandled = TRUE;
@@ -96,7 +101,8 @@ LRESULT Window::OnSizing(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 //-------------------------------------------------------------------------------------
 // Our Window stuff
 
-Window::Window(uint16_t width, uint16_t height, const std::wstring &title, Style style)
+Window::Window(uint16_t width, uint16_t height, const std::wstring &title, Style style, const Callback &callback) :
+	m_Callback(callback)
 {
 	Create(nullptr,
 		   RECT{ 0, 0, width, height },
@@ -104,8 +110,8 @@ Window::Window(uint16_t width, uint16_t height, const std::wstring &title, Style
 		   WS_OVERLAPPEDWINDOW,
 		   WS_EX_OVERLAPPEDWINDOW | WS_EX_LAYERED | WS_EX_COMPOSITED);
 
-	Resize(width, height);
 	Restyle(style);
+	Resize(width, height);
 }
 
 Window::~Window()
@@ -140,16 +146,21 @@ void Window::Restyle(Style style)
 
 	ModifyStyle(rmStyle, adStyle);
 	ModifyStyleEx(rmExStyle, adExStyle);
-	CenterWindow();
-
-	if (style == Window::Fullscreen)
+	
+	if (m_IsFullscreen)
 	{
 		MONITORINFO mi{ 0 };
 		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 
-		SetWindowPos(HWND_TOP,
-					 &mi.rcMonitor,
-					 SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+		BOOL bRet = SetWindowPos(HWND_TOP,
+								 &mi.rcMonitor,
+								 SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+		ATLASSERT(bRet);
+
+	}
+	else
+	{
+		CenterWindow();
 	}
 }
 
@@ -167,18 +178,11 @@ void Window::Retitle(const std::wstring &title)
 	SetWindowText(title.c_str());
 }
 
-void Window::Show(bool show)
+void Window::Show(int showCmd)
 {
-	if (!m_hWnd)
-		return;
-
-	if (show)
+	if (m_hWnd)
 	{
-		ShowWindow(SW_SHOW);
-	}
-	else
-	{
-		ShowWindow(SW_HIDE);
+		ShowWindow(showCmd);
 	}
 }
 

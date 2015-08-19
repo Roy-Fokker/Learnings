@@ -2,6 +2,7 @@
 
 #include <string>
 #include <cstdint>
+#include <functional>
 
 #include <Windows.h>
 #include <atlbase.h>
@@ -40,16 +41,29 @@ namespace Learnings
 			Borderless,
 			Fullscreen
 		};
+
+		enum Message
+		{
+			Activate,
+			Deactivate,
+			Pause,
+			Resume,
+			Resized,
+			Maximized,
+			Close
+		};
+
+		typedef std::function<bool(Message, uint16_t, uint16_t)> Callback;
 		
 	public:
-		Window(uint16_t width, uint16_t height, const std::wstring &title, Style style);
+		Window(uint16_t width, uint16_t height, const std::wstring &title, Style style, const Callback &callback);
 		~Window();
 
 		void Restyle(Style style);
 		void Resize(uint16_t width, uint16_t height);
 		void Retitle(const std::wstring &title);
 
-		void Show(bool show);
+		void Show(int showCmd);
 
 		bool ProcessMessages();
 
@@ -59,6 +73,7 @@ namespace Learnings
 		bool m_IsFullscreen = false;
 
 
+		Callback m_Callback;
 	};
 
 }
