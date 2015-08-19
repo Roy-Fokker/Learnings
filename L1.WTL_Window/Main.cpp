@@ -33,7 +33,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 				wnd->Restyle(Window::Style::Windowed);
 				break;
 			case Window::Maximized:
-				//wnd->Restyle(Window::Style::Fullscreen);
+				wnd->Restyle(Window::Style::Fullscreen);
 				break;
 			case Learnings::Window::Close:
 				return true;

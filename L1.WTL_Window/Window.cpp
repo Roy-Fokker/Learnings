@@ -149,7 +149,7 @@ void Window::Restyle(Style style)
 	
 	if (m_IsFullscreen)
 	{
-		MONITORINFO mi{ 0 };
+		MONITORINFO mi = { sizeof(MONITORINFO) };
 		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 
 		BOOL bRet = SetWindowPos(HWND_TOP,
