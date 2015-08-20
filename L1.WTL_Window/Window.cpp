@@ -146,21 +146,16 @@ void Window::Restyle(Style style)
 
 	ModifyStyle(rmStyle, adStyle);
 	ModifyStyleEx(rmExStyle, adExStyle);
+	CenterWindow();
 	
 	if (m_IsFullscreen)
 	{
-		MONITORINFO mi = { sizeof(MONITORINFO) };
+		MONITORINFO mi { sizeof(MONITORINFO) };
 		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 
 		BOOL bRet = SetWindowPos(HWND_TOP,
 								 &mi.rcMonitor,
 								 SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
-		ATLASSERT(bRet);
-
-	}
-	else
-	{
-		CenterWindow();
 	}
 }
 
