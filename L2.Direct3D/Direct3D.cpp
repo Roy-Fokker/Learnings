@@ -22,8 +22,7 @@ using namespace Learnings;
 namespace
 {
 	static const DXGI_FORMAT C_SwapChainFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-	static const UINT C_MSAAQuality = 4U;
-
+	
 	inline void GetWindowSize(HWND hWnd, uint16_t &width, uint16_t &height)
 	{
 		RECT rect;
@@ -31,6 +30,25 @@ namespace
 
 		height = (uint16_t)(rect.bottom - rect.top);
 		width = (uint16_t)(rect.right - rect.left);
+	}
+
+	inline DXGI_SAMPLE_DESC QueryMsaaLevel(ID3D11Device *device)
+	{
+		DXGI_SAMPLE_DESC sd{ 1, 0 };
+
+		UINT msaa = 0;
+		UINT sampleCount = 4U;
+		HRESULT hr = device->CheckMultisampleQualityLevels(C_SwapChainFormat, sampleCount, &msaa);
+		if (SUCCEEDED(hr))
+		{
+			if (msaa - 1 > 0)
+			{
+				sd.Count = sampleCount;
+				sd.Quality = msaa - 1;
+			}
+		}
+
+		return sd;
 	}
 
 	inline DXGI_RATIONAL QueryRefreshRate(CComPtr<IDXGIAdapter> dxgiAdapter, uint16_t width, uint16_t height, BOOL vSync)
@@ -152,12 +170,6 @@ void Direct3d::CreateSwapChain()
 	hr = dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void **)&dxgiFactory);
 	ThrowIfFailed(hr, "Failed to get DXGI Factory");
 
-
-	UINT msaa = 0;
-#ifndef _DEBUG
-	// TODO: GetMaxMSAAValue(m_Device)
-	msaa = GetMaxMSAAValue(m_Device);
-#endif
 	uint16_t width, height;
 	GetWindowSize(m_hWnd, width, height);
 
@@ -174,8 +186,7 @@ void Direct3d::CreateSwapChain()
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.OutputWindow = m_hWnd;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-	sd.SampleDesc.Count = (msaa) ? C_MSAAQuality : 1;
-	sd.SampleDesc.Quality = (msaa) ? msaa - 1 : 0;
+	sd.SampleDesc = QueryMsaaLevel(m_Device.p);
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	sd.Windowed = TRUE;
 	sd.BufferDesc.RefreshRate = QueryRefreshRate(dxgiAdapter, width, height, m_vSync);
@@ -246,12 +257,6 @@ void Direct3d::DeleteRenderTargetView()
 
 void Direct3d::CreateDepthStencilBuffer(uint16_t width, uint16_t height)
 {
-	UINT msaa = 0;
-#ifndef _DEBUG
-	// TODO: GetMaxMSAAValue(m_Device)
-	msaa = GetMaxMSAAValue(m_Device);
-#endif
-
 	HRESULT hr;
 
 	D3D11_TEXTURE2D_DESC td{ 0 };
@@ -260,8 +265,7 @@ void Direct3d::CreateDepthStencilBuffer(uint16_t width, uint16_t height)
 	td.MipLevels = 1;
 	td.ArraySize = 1;
 	td.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	td.SampleDesc.Count = (msaa) ? C_MSAAQuality : 1;
-	td.SampleDesc.Quality = (msaa) ? msaa - 1 : 0;
+	td.SampleDesc = QueryMsaaLevel(m_Device.p);
 	td.Usage = D3D11_USAGE_DEFAULT;
 	td.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
