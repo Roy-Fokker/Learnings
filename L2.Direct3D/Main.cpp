@@ -3,6 +3,7 @@
 #include "Main.h"
 
 #include "Window.h"
+#include "Direct3D.h"
 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
@@ -11,6 +12,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
 
 	std::unique_ptr<Learnings::Window> wnd;
+	std::unique_ptr<Learnings::Direct3d> d3d;
 
 	auto callback = [&](Learnings::Window::Message msg, uint16_t v1, uint16_t v2) -> bool
 	{
@@ -31,9 +33,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 				break;
 			case Window::Resized:
 				wnd->Restyle(Window::Style::Windowed);
+				d3d->Resize();
 				break;
 			case Window::Maximized:
 				wnd->Restyle(Window::Style::Fullscreen);
+				d3d->Resize();
 				break;
 			case Learnings::Window::Close:
 				return true;
@@ -44,13 +48,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	};
 
 
-	wnd = std::make_unique<Learnings::Window>(800, 500, L"Test Window", Learnings::Window::Style::Windowed, callback);
+	wnd = std::make_unique<Learnings::Window>(800, 500, L"L2.Direct 3D", Learnings::Window::Style::Windowed, callback);
+
+	d3d = std::make_unique<Learnings::Direct3d>(wnd->m_hWnd);
 
 	wnd->Show(nCmdShow);
-
+	// Main Loop
 	while (wnd->ProcessMessages())
 	{
-
+		d3d->Draw();
 	}
 
 	CoUninitialize();
