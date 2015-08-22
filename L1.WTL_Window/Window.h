@@ -22,6 +22,7 @@ namespace Learnings
 			MESSAGE_HANDLER(WM_ACTIVATEAPP, OnActivate)
 			MESSAGE_HANDLER(WM_SIZE, OnResize)
 			MESSAGE_RANGE_HANDLER(WM_ENTERSIZEMOVE, WM_EXITSIZEMOVE, OnSizing)
+			MESSAGE_HANDLER(WM_SYSCOMMAND, OnSystemCommand)
 		END_MSG_MAP()
 
 	private:
@@ -31,6 +32,7 @@ namespace Learnings
 		LRESULT OnActivate(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
 		LRESULT OnResize(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
 		LRESULT OnSizing(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
+		LRESULT OnSystemCommand(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
 
 	//-------------------------------------------------------------------------------------
 	// Our Window stuff

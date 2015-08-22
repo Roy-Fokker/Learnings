@@ -181,15 +181,13 @@ void Direct3d::CreateSwapChain()
 	sd.BufferDesc.Format = C_SwapChainFormat;
 	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	sd.BufferDesc.RefreshRate.Numerator = 0;
-	sd.BufferDesc.RefreshRate.Denominator = 1;
+	sd.BufferDesc.RefreshRate = QueryRefreshRate(dxgiAdapter, width, height, m_vSync);
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.OutputWindow = m_hWnd;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.SampleDesc = QueryMsaaLevel(m_Device.p);
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	sd.Windowed = TRUE;
-	sd.BufferDesc.RefreshRate = QueryRefreshRate(dxgiAdapter, width, height, m_vSync);
 
 	hr = dxgiFactory->CreateSwapChain(m_Device, &sd, &m_SwapChain);
 	ThrowIfFailed(hr, "Failed to create SwapChain");

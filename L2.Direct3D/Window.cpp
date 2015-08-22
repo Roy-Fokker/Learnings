@@ -97,6 +97,23 @@ LRESULT Window::OnSizing(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 	return 0;
 }
 
+LRESULT Learnings::Window::OnSystemCommand(UINT msg, WPARAM wParam, LPARAM lParam, BOOL & bHandled)
+{
+	if (wParam == SC_KEYMENU && lParam == VK_RETURN)
+	{
+		if (m_IsFullscreen)
+		{
+			ShowWindow(SW_RESTORE);
+		}
+		else
+		{
+			ShowWindow(SW_MAXIMIZE);
+		}
+	}
+
+	return DefWindowProc();
+}
+
 
 //-------------------------------------------------------------------------------------
 // Our Window stuff
