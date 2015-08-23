@@ -206,9 +206,13 @@ bool Window::ProcessMessages()
 	do
 	{
 		if (m_IsActive)
+		{
 			bRet = PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE);
+		}
 		else
+		{
 			bRet = GetMessage(&msg, nullptr, 0, 0);
+		}
 
 		if (bRet)
 		{
