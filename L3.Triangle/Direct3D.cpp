@@ -16,6 +16,7 @@ if ( FAILED(hr) ) \
 #include <d3dcommon.h>
 
 #include "Direct3D.h"
+#include "Mesh.h"
 
 using namespace Learnings;
 
@@ -106,15 +107,16 @@ Direct3d::~Direct3d()
 	DeleteDevice();
 }
 
-void Direct3d::Draw()
+void Direct3d::Clear()
 {
 	static std::array<float, 4> color{ 0.25f, 0.25f, 0.5f, 1.0f };
 
 	m_Context->ClearRenderTargetView(m_RenderTargetView, &color[0]);
 	m_Context->ClearDepthStencilView(m_DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+}
 
-
-
+void Direct3d::Present()
+{
 	m_SwapChain->Present(m_vSync, 0);
 }
 
@@ -122,6 +124,77 @@ void Direct3d::Resize()
 {
 	DeleteViewBuffer();
 	CreateViewBuffer();
+}
+
+Direct3d::Context Direct3d::GetContext() const
+{
+	return m_Context;
+}
+
+Direct3d::Buffer Direct3d::CreateBuffer(uint32_t size, const void *data, D3D11_BIND_FLAG bindFlags, D3D11_USAGE usage, UINT accessFlags)
+{
+	D3D11_BUFFER_DESC bd{ 0 };
+	bd.Usage = usage;
+	bd.ByteWidth = size;
+	bd.BindFlags = bindFlags;
+	bd.CPUAccessFlags = accessFlags;
+
+	D3D11_SUBRESOURCE_DATA bData{ 0 };
+	bData.pSysMem = data;
+
+	Buffer buf;
+	HRESULT hr = m_Device->CreateBuffer(&bd, &bData, &(buf.p));
+	ThrowIfFailed(hr, "Failed to create buffer");
+
+	return buf;
+}
+
+Direct3d::VertexShader Direct3d::CreateVertexShader(uint32_t size, const void *vs)
+{
+	VertexShader vsh;
+
+	HRESULT hr = m_Device->CreateVertexShader(vs, size, NULL, &vsh);
+	ThrowIfFailed(hr, "Failed to create vertex shader");
+
+	return vsh;
+}
+
+Direct3d::PixelShader Direct3d::CreatePixelShader(uint32_t size, const void *ps)
+{
+	PixelShader psh;
+	HRESULT hr = m_Device->CreatePixelShader(ps, size, NULL, &psh);
+	ThrowIfFailed(hr, "Failed to create pixel shader");
+
+	return psh;
+}
+
+Direct3d::InputLayout Direct3d::CreateInputLayout(uint32_t elemCount, const D3D11_INPUT_ELEMENT_DESC * elemDesc, uint32_t size, const void * vs)
+{
+	InputLayout il;
+
+	HRESULT hr = m_Device->CreateInputLayout(elemDesc,
+										   elemCount,
+										   vs, size,
+										   &il);
+	ThrowIfFailed(hr, "Failed to create input layout");
+
+	return il;
+}
+
+bool Direct3d::CheckInputLayout(uint32_t elemCount, const D3D11_INPUT_ELEMENT_DESC * elemDesc, uint32_t size, const void * vs)
+{
+	HRESULT hr = m_Device->CreateInputLayout(elemDesc,
+										   elemCount,
+										   vs, size,
+										   NULL);
+	// CreateInputLayout returns S_FALSE, 
+	// if the signature of the InputLayout Matches that of the Shader's Inputs
+	if (hr == S_FALSE)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 void Direct3d::CreateDevice()
