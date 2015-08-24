@@ -58,7 +58,7 @@ void Renderer::AddGeometry(const Mesh &mesh)
 										D3D11_BIND_INDEX_BUFFER,
 										D3D11_USAGE_DEFAULT,
 										NULL);
-	m_IndexCount = mesh.indices.size();
+	m_IndexCount = (uint32_t)mesh.indices.size();
 }
 
 void Renderer::AddShader(const std::vector<byte>& vs, const std::vector<byte>& ps)
