@@ -19,6 +19,7 @@ namespace Learnings
 
 		void AddGeometry(const Mesh &mesh);
 		void AddShader(const std::vector<byte> &vs, const std::vector<byte> &ps);
+		void AddTexture(const std::vector<byte> &tex);
 
 	private:
 		std::unique_ptr<Learnings::Direct3d> m_d3d;

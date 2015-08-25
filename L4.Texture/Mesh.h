@@ -11,8 +11,9 @@ namespace Learnings
 	struct Vertex
 	{
 		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT2 texCoord;
 
-		static const uint8_t C_VertexElementCount = 1;
+		static const uint8_t C_VertexElementCount = 2;
 		static const std::array<D3D11_INPUT_ELEMENT_DESC, C_VertexElementCount> ElementsDesc;
 		static const uint32_t Size;
 	};

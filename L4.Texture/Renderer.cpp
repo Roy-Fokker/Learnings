@@ -74,3 +74,7 @@ void Renderer::AddShader(const std::vector<byte>& vs, const std::vector<byte>& p
 	m_PixelShader = m_d3d->CreatePixelShader((uint32_t)ps.size(),
 											 ps.data());
 }
+
+void Learnings::Renderer::AddTexture(const std::vector<byte>& tex)
+{
+}

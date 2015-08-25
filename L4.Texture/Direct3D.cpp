@@ -168,7 +168,7 @@ Direct3d::PixelShader Direct3d::CreatePixelShader(uint32_t size, const void *ps)
 	return psh;
 }
 
-Direct3d::InputLayout Direct3d::CreateInputLayout(uint32_t elemCount, const D3D11_INPUT_ELEMENT_DESC * elemDesc, uint32_t size, const void * vs)
+Direct3d::InputLayout Direct3d::CreateInputLayout(uint32_t elemCount, const D3D11_INPUT_ELEMENT_DESC * elemDesc, uint32_t size, const void *vs)
 {
 	InputLayout il;
 
@@ -181,7 +181,7 @@ Direct3d::InputLayout Direct3d::CreateInputLayout(uint32_t elemCount, const D3D1
 	return il;
 }
 
-bool Direct3d::CheckInputLayout(uint32_t elemCount, const D3D11_INPUT_ELEMENT_DESC * elemDesc, uint32_t size, const void * vs)
+bool Direct3d::CheckInputLayout(uint32_t elemCount, const D3D11_INPUT_ELEMENT_DESC * elemDesc, uint32_t size, const void *vs)
 {
 	HRESULT hr = m_Device->CreateInputLayout(elemDesc,
 										   elemCount,
@@ -195,6 +195,11 @@ bool Direct3d::CheckInputLayout(uint32_t elemCount, const D3D11_INPUT_ELEMENT_DE
 	}
 
 	return false;
+}
+
+Direct3d::ShaderResourceView Direct3d::CreateShaderResourceView(uint32_t size, const void *tex)
+{
+	
 }
 
 void Direct3d::CreateDevice()
