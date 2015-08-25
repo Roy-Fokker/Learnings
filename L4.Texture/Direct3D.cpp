@@ -15,6 +15,8 @@ if ( FAILED(hr) ) \
 #include <vector>
 #include <d3dcommon.h>
 
+#include <DDSTextureLoader.h>
+
 #include "Direct3D.h"
 #include "Mesh.h"
 
