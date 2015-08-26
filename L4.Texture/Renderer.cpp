@@ -23,6 +23,8 @@ void Renderer::Draw()
 		context->VSSetShader(m_VertexShader, NULL, NULL);
 		context->PSSetShader(m_PixelShader, NULL, NULL);
 
+		context->PSSetShaderResources(0, 1, &(m_ShaderResourceView.p));
+
 		context->IASetInputLayout(m_InputLayout);
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -77,4 +79,6 @@ void Renderer::AddShader(const std::vector<byte>& vs, const std::vector<byte>& p
 
 void Learnings::Renderer::AddTexture(const std::vector<byte>& tex)
 {
+	m_ShaderResourceView = m_d3d->CreateShaderResourceView((uint32_t)tex.size(),
+														   tex.data());
 }

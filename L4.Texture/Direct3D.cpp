@@ -15,7 +15,7 @@ if ( FAILED(hr) ) \
 #include <vector>
 #include <d3dcommon.h>
 
-#include <DDSTextureLoader.h>
+#include <DDSTextureLoader.cpp>
 
 #include "Direct3D.h"
 #include "Mesh.h"
@@ -199,9 +199,20 @@ bool Direct3d::CheckInputLayout(uint32_t elemCount, const D3D11_INPUT_ELEMENT_DE
 	return false;
 }
 
-Direct3d::ShaderResourceView Direct3d::CreateShaderResourceView(uint32_t size, const void *tex)
+Direct3d::ShaderResourceView Direct3d::CreateShaderResourceView(uint32_t size, const uint8_t *tex)
 {
-	
+	HRESULT hr;
+
+	ShaderResourceView view;
+
+	hr = DirectX::CreateDDSTextureFromMemory(m_Device,
+											 tex,
+											 size,
+											 nullptr,
+											 &view);
+	ThrowIfFailed(hr, "Cannot create shader resource view");
+
+	return view;
 }
 
 void Direct3d::CreateDevice()

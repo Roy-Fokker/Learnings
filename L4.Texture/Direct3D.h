@@ -44,7 +44,7 @@ namespace Learnings
 		PixelShader CreatePixelShader(uint32_t size, const void *ps);
 		InputLayout CreateInputLayout(uint32_t elemCount, const D3D11_INPUT_ELEMENT_DESC *elemDesc, uint32_t vsSize, const void *vs);
 		bool CheckInputLayout(uint32_t elemCount, const D3D11_INPUT_ELEMENT_DESC *elemDesc, uint32_t vsSize, const void *vs);
-		ShaderResourceView CreateShaderResourceView(uint32_t size, const void *tex);
+		ShaderResourceView CreateShaderResourceView(uint32_t size, const uint8_t *tex);
 
 	private:
 		void CreateDevice();

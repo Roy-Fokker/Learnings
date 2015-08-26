@@ -32,5 +32,7 @@ namespace Learnings
 		Direct3d::VertexShader m_VertexShader;
 		Direct3d::PixelShader m_PixelShader;
 		Direct3d::InputLayout m_InputLayout;
+
+		Direct3d::ShaderResourceView m_ShaderResourceView;
 	};
 }

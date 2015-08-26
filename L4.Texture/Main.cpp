@@ -34,12 +34,13 @@ Learnings::Mesh TriangleMesh (float base, float height, float delta)
 		x3 = base * delta, y3 = halfHeight,
 		x2 = halfBase, y2 = y1;
 
+	float oset = 0.5f + delta;
 	return {
 		// Vertex List
 		{
-			{ { x1, y1, +0.5f } },
-			{ { x3, y3, +0.5f } },
-			{ { x2, y2, +0.5f } },
+			{ { x1, y1, +0.5f }, { 0.0f, 1.0f } },
+			{ { x3, y3, +0.5f }, { oset, 0.0f } },
+			{ { x2, y2, +0.5f }, { 1.0f, 1.0f } },
 		},
 
 		// Index List
@@ -100,6 +101,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	auto ps = ReadBinaryFile(L"PixelShader.cso");
 	rndr->AddShader(vs, ps);
 
+	auto texture = ReadBinaryFile(L"uv_grid.dds");
+	rndr->AddTexture(texture);
 
 	wnd->Show(nCmdShow);
 	// Main Loop

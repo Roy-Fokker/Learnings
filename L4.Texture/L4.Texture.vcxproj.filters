@@ -16,6 +16,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{dbd58a1a-ac07-444d-be6b-36418c548dbd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Texture">
+      <UniqueIdentifier>{024b5cb4-5abf-46cf-a5a7-c82585b74dba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Window.cpp">
@@ -58,5 +61,10 @@
     <FxCompile Include="VertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ImageContentTask Include="uv_grid.dds">
+      <Filter>Texture</Filter>
+    </ImageContentTask>
   </ItemGroup>
 </Project>
