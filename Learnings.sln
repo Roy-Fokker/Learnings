@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "L3.Triangle", "L3.Triangle\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "L4.Texture", "L4.Texture\L4.Texture.vcxproj", "{D6C283EB-97C5-4921-9F42-E086EA53BBC0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "L5.Transformation", "L5.Transformation\L5.Transformation.vcxproj", "{D197FE13-62AD-4CB9-88F8-64EFC2B63FB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{D6C283EB-97C5-4921-9F42-E086EA53BBC0}.Release|x64.Build.0 = Release|x64
 		{D6C283EB-97C5-4921-9F42-E086EA53BBC0}.Release|x86.ActiveCfg = Release|Win32
 		{D6C283EB-97C5-4921-9F42-E086EA53BBC0}.Release|x86.Build.0 = Release|Win32
+		{D197FE13-62AD-4CB9-88F8-64EFC2B63FB6}.Debug|x64.ActiveCfg = Debug|x64
+		{D197FE13-62AD-4CB9-88F8-64EFC2B63FB6}.Debug|x64.Build.0 = Debug|x64
+		{D197FE13-62AD-4CB9-88F8-64EFC2B63FB6}.Debug|x86.ActiveCfg = Debug|Win32
+		{D197FE13-62AD-4CB9-88F8-64EFC2B63FB6}.Debug|x86.Build.0 = Debug|Win32
+		{D197FE13-62AD-4CB9-88F8-64EFC2B63FB6}.Release|x64.ActiveCfg = Release|x64
+		{D197FE13-62AD-4CB9-88F8-64EFC2B63FB6}.Release|x64.Build.0 = Release|x64
+		{D197FE13-62AD-4CB9-88F8-64EFC2B63FB6}.Release|x86.ActiveCfg = Release|Win32
+		{D197FE13-62AD-4CB9-88F8-64EFC2B63FB6}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
