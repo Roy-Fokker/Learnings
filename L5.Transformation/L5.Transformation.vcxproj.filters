@@ -63,8 +63,8 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="uv_grid.dds">
+    <ImageContentTask Include="uv_grid.dds">
       <Filter>Textures</Filter>
-    </Image>
+    </ImageContentTask>
   </ItemGroup>
 </Project>

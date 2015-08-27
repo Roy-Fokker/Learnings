@@ -100,6 +100,24 @@ void Renderer::SetTransforms(const Transform &transform)
 	}
 	else
 	{
-		//TODO: update buffer
+		auto context = m_d3d->GetContext();
+		HRESULT hr;
+		D3D11_MAPPED_SUBRESOURCE buffer;
+
+		hr = context->Map(m_TransformBuffer, 
+						  NULL,
+						  D3D11_MAP_WRITE_DISCARD,
+						  NULL,
+						  &buffer);
+		if (FAILED(hr))
+		{
+			assert(hr != S_OK); // Do something here?????
+		}
+
+		Transform *to = reinterpret_cast<Transform *>(buffer.pData);
+		to->matrix = transform.matrix;
+
+		context->Unmap(m_TransformBuffer, 
+					   NULL);
 	}
 }
