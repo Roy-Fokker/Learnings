@@ -102,6 +102,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 									   DirectX::XMConvertToRadians(90.0f));
 	Learnings::Transform transform{ DirectX::XMMatrixTranspose(ms) };
 	rndr->SetTransforms(transform);
+	rndr->SetTransforms(transform);
 
 	auto vs = ReadBinaryFile(L"VertexShader.cso");
 	auto ps = ReadBinaryFile(L"PixelShader.cso");

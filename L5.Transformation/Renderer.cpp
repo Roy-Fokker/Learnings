@@ -109,11 +109,8 @@ void Renderer::SetTransforms(const Transform &transform)
 						  D3D11_MAP_WRITE_DISCARD,
 						  NULL,
 						  &buffer);
-		if (FAILED(hr))
-		{
-			assert(hr != S_OK); // Do something here?????
-		}
-
+		assert(hr == S_OK && "constant buffer could not be locked"); // Do something here?????
+		
 		Transform *to = reinterpret_cast<Transform *>(buffer.pData);
 		to->matrix = transform.matrix;
 
