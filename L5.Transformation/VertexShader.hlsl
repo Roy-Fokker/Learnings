@@ -1,3 +1,8 @@
+cbuffer transform : register(b0)
+{
+	matrix wrld;
+}
+
 struct VS_INPUT
 {
 	float4 pos : POSITION;
@@ -16,7 +21,9 @@ VS_OUTPUT main(VS_INPUT input)
 
 	input.pos.w = 1.0f;
 
-	output = input;
+	output.pos = mul(input.pos, wrld);
+
+	output.uv = input.uv;
 	
 	return output;
 }

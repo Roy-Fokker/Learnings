@@ -18,6 +18,7 @@ void Renderer::Draw()
 	m_d3d->Clear();
 	{
 		uint32_t vertexOffset = 0, indexOffset = 0;
+		uint32_t slot = 0, count = 1;
 		auto context = m_d3d->GetContext();
 
 		context->VSSetShader(m_VertexShader, NULL, NULL);
@@ -36,6 +37,10 @@ void Renderer::Draw()
 		context->IASetIndexBuffer(m_IndexBuffer,
 								  DXGI_FORMAT_R32_UINT,
 								  indexOffset);
+		
+		context->VSSetConstantBuffers(slot,
+									  count,
+									  &(m_TransformBuffer.p));
 
 		context->DrawIndexed(m_IndexCount, 0, 0);
 	}
@@ -63,7 +68,7 @@ void Renderer::AddGeometry(const Mesh &mesh)
 	m_IndexCount = (uint32_t)mesh.indices.size();
 }
 
-void Renderer::AddShader(const std::vector<byte>& vs, const std::vector<byte>& ps)
+void Renderer::AddShader(const std::vector<byte> &vs, const std::vector<byte> &ps)
 {
 	m_InputLayout = m_d3d->CreateInputLayout(Vertex::C_VertexElementCount,
 											 Vertex::ElementsDesc.data(),
@@ -77,8 +82,24 @@ void Renderer::AddShader(const std::vector<byte>& vs, const std::vector<byte>& p
 											 ps.data());
 }
 
-void Learnings::Renderer::AddTexture(const std::vector<byte>& tex)
+void Renderer::AddTexture(const std::vector<byte> &tex)
 {
 	m_ShaderResourceView = m_d3d->CreateShaderResourceView((uint32_t)tex.size(),
 														   tex.data());
+}
+
+void Renderer::SetTransforms(const Transform &transform)
+{
+	if (!m_TransformBuffer)
+	{
+		m_TransformBuffer = m_d3d->CreateBuffer(sizeof(Transform),
+												&transform,
+												D3D11_BIND_CONSTANT_BUFFER,
+												D3D11_USAGE_DYNAMIC,
+												D3D11_CPU_ACCESS_WRITE);
+	}
+	else
+	{
+		//TODO: update buffer
+	}
 }

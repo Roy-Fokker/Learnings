@@ -90,12 +90,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	};
 
 
-	wnd = std::make_unique<Learnings::Window>(800, 500, L"L2.Direct 3D", Learnings::Window::Style::Windowed, callback);
+	wnd = std::make_unique<Learnings::Window>(800, 500, L"L5. Transformations", Learnings::Window::Style::Windowed, callback);
 	rndr = std::make_unique<Learnings::Renderer>(wnd->m_hWnd);
 	
 
 	auto triangle = TriangleMesh(1.0f, 1.0f, 0.0f);
 	rndr->AddGeometry(triangle);
+	
+	auto ms = DirectX::XMMatrixIdentity();
+	ms = DirectX::XMMatrixRotationAxis({{0.0f, 0.0f, 1.0f}}, 
+									   DirectX::XMConvertToRadians(90.0f));
+	Learnings::Transform transform{ DirectX::XMMatrixTranspose(ms) };
+	rndr->SetTransforms(transform);
 
 	auto vs = ReadBinaryFile(L"VertexShader.cso");
 	auto ps = ReadBinaryFile(L"PixelShader.cso");

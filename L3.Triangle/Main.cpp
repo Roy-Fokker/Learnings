@@ -89,7 +89,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	};
 
 
-	wnd = std::make_unique<Learnings::Window>(800, 500, L"L2.Direct 3D", Learnings::Window::Style::Windowed, callback);
+	wnd = std::make_unique<Learnings::Window>(800, 500, L"L3. Triangle", Learnings::Window::Style::Windowed, callback);
 	rndr = std::make_unique<Learnings::Renderer>(wnd->m_hWnd);
 	
 	auto triangle = TriangleMesh(1.0f, 1.0f, -0.5f);

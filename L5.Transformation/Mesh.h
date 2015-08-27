@@ -27,4 +27,8 @@ namespace Learnings
 		IndexList indices;
 	};
 
+	struct Transform
+	{
+		DirectX::XMMATRIX matrix;
+	};
 }
