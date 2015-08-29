@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "L5.Transformation", "L5.Tra
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "L6.Projection", "L6.Projection\L6.Projection.vcxproj", "{BEC4F938-EE46-4207-86B9-22FF5A0443E8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "L7.Meshes", "L7.Meshes\L7.Meshes.vcxproj", "{FD543D25-B8F2-4097-8F49-2EE45E12D109}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -71,6 +73,14 @@ Global
 		{BEC4F938-EE46-4207-86B9-22FF5A0443E8}.Release|x64.Build.0 = Release|x64
 		{BEC4F938-EE46-4207-86B9-22FF5A0443E8}.Release|x86.ActiveCfg = Release|Win32
 		{BEC4F938-EE46-4207-86B9-22FF5A0443E8}.Release|x86.Build.0 = Release|Win32
+		{FD543D25-B8F2-4097-8F49-2EE45E12D109}.Debug|x64.ActiveCfg = Debug|x64
+		{FD543D25-B8F2-4097-8F49-2EE45E12D109}.Debug|x64.Build.0 = Debug|x64
+		{FD543D25-B8F2-4097-8F49-2EE45E12D109}.Debug|x86.ActiveCfg = Debug|Win32
+		{FD543D25-B8F2-4097-8F49-2EE45E12D109}.Debug|x86.Build.0 = Debug|Win32
+		{FD543D25-B8F2-4097-8F49-2EE45E12D109}.Release|x64.ActiveCfg = Release|x64
+		{FD543D25-B8F2-4097-8F49-2EE45E12D109}.Release|x64.Build.0 = Release|x64
+		{FD543D25-B8F2-4097-8F49-2EE45E12D109}.Release|x86.ActiveCfg = Release|Win32
+		{FD543D25-B8F2-4097-8F49-2EE45E12D109}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
