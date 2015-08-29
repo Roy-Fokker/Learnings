@@ -83,26 +83,19 @@ void Renderer::AddGeometry(uint32_t meshId, const Mesh &mesh)
 	auto &mo = m_Meshes[mId];
 
 	mo.id = mId;
-
-	if (mo.vertexBuffer)
-	{
-		mo.vertexBuffer.Release();
-	}
+	
 	mo.vertexBuffer = m_d3d->CreateBuffer((uint32_t)mesh.vertices.size() * Vertex::Size,
 										 mesh.vertices.data(),
 										 D3D11_BIND_VERTEX_BUFFER,
 										 D3D11_USAGE_DEFAULT,
 										 NULL);
 
-	if (mo.indexBuffer)
-	{
-		mo.indexBuffer.Release();
-	}
 	mo.indexBuffer = m_d3d->CreateBuffer((uint32_t)mesh.indices.size() * sizeof(uint32_t),
 										mesh.indices.data(),
 										D3D11_BIND_INDEX_BUFFER,
 										D3D11_USAGE_DEFAULT,
 										NULL);
+	
 	mo.indexCount = (uint32_t)mesh.indices.size();
 }
 
