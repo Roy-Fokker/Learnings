@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "Renderer.h"
 
 #include "Mesh.h"
@@ -29,23 +31,32 @@ void Renderer::Draw()
 		context->IASetInputLayout(m_InputLayout);
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		context->IASetVertexBuffers(0,
-									1,
-									&(m_VertexBuffer.p),
-									&Vertex::Size,
-									&vertexOffset);
-		context->IASetIndexBuffer(m_IndexBuffer,
-								  DXGI_FORMAT_R32_UINT,
-								  indexOffset);
-		
 		context->VSSetConstantBuffers(slot,
 									  count,
 									  &(m_ProjectionBuffer.p));
-		context->VSSetConstantBuffers(slot + 1,
-									  count,
-									  &(m_TransformBuffer.p));
 
-		context->DrawIndexed(m_IndexCount, 0, 0);
+		for (auto &mesh : m_Meshes)
+		{
+			context->IASetVertexBuffers(0,
+										1,
+										&(mesh.vertexBuffer.p),
+										&Vertex::Size,
+										&vertexOffset);
+			context->IASetIndexBuffer(mesh.indexBuffer,
+									  DXGI_FORMAT_R32_UINT,
+									  indexOffset);
+
+			auto itRange = m_TransformBuffer.equal_range(mesh.id);
+			std::for_each(itRange.first, itRange.second, [&](auto& it)
+			{
+				auto transformBuffer = it.second;
+				context->VSSetConstantBuffers(slot + 1,
+											  count,
+											  &(transformBuffer.p));
+
+				context->DrawIndexed(mesh.indexCount, 0, 0);
+			});
+		}
 	}
 	m_d3d->Present();
 }
@@ -55,20 +66,44 @@ void Renderer::Resize()
 	m_d3d->Resize();
 }
 
-void Renderer::AddGeometry(const Mesh &mesh)
+void Renderer::AddGeometry(uint32_t meshId, const Mesh &mesh)
 {
-	m_VertexBuffer = m_d3d->CreateBuffer((uint32_t)mesh.vertices.size() * Vertex::Size,
+	uint32_t mId = (uint32_t)m_Meshes.size();
+
+	auto it = m_MeshIds.find(meshId);
+	if (it != m_MeshIds.end())
+	{
+		mId = it->second;
+	}
+	else
+	{
+		m_Meshes.push_back(RenderableMesh());
+	}
+
+	auto &mo = m_Meshes[mId];
+
+	mo.id = mId;
+
+	if (mo.vertexBuffer)
+	{
+		mo.vertexBuffer.Release();
+	}
+	mo.vertexBuffer = m_d3d->CreateBuffer((uint32_t)mesh.vertices.size() * Vertex::Size,
 										 mesh.vertices.data(),
 										 D3D11_BIND_VERTEX_BUFFER,
 										 D3D11_USAGE_DEFAULT,
 										 NULL);
 
-	m_IndexBuffer = m_d3d->CreateBuffer((uint32_t)mesh.indices.size() * sizeof(uint32_t),
+	if (mo.indexBuffer)
+	{
+		mo.indexBuffer.Release();
+	}
+	mo.indexBuffer = m_d3d->CreateBuffer((uint32_t)mesh.indices.size() * sizeof(uint32_t),
 										mesh.indices.data(),
 										D3D11_BIND_INDEX_BUFFER,
 										D3D11_USAGE_DEFAULT,
 										NULL);
-	m_IndexCount = (uint32_t)mesh.indices.size();
+	mo.indexCount = (uint32_t)mesh.indices.size();
 }
 
 void Renderer::AddShader(const std::vector<byte> &vs, const std::vector<byte> &ps)
@@ -91,23 +126,38 @@ void Renderer::AddTexture(const std::vector<byte> &tex)
 														   tex.data());
 }
 
-void Renderer::SetTransforms(const Transform &transform)
+void Renderer::SetTransforms(uint32_t meshId, uint32_t instanceId, const Transform &transform)
 {
-	if (!m_TransformBuffer)
+	auto instanceCount = m_TransformBuffer.count(meshId);
+
+	if (instanceCount + 1 < instanceId && instanceId != 0)
 	{
-		m_TransformBuffer = m_d3d->CreateBuffer(sizeof(Transform),
-												&transform,
-												D3D11_BIND_CONSTANT_BUFFER,
-												D3D11_USAGE_DYNAMIC,
-												D3D11_CPU_ACCESS_WRITE);
+		return;
+	}
+
+	auto itRange = m_TransformBuffer.equal_range(meshId);
+	auto it = std::next(itRange.first, instanceId);
+	if (itRange.first == m_TransformBuffer.end() ||
+		it == m_TransformBuffer.end())
+	{
+
+		auto transformBuffer = m_d3d->CreateBuffer(sizeof(Transform),
+												   &transform,
+												   D3D11_BIND_CONSTANT_BUFFER,
+												   D3D11_USAGE_DYNAMIC,
+												   D3D11_CPU_ACCESS_WRITE);
+
+		m_TransformBuffer.insert({ meshId, transformBuffer });
 	}
 	else
 	{
+		auto transformBuffer = it->second;
+
 		auto context = m_d3d->GetContext();
 		HRESULT hr;
 		D3D11_MAPPED_SUBRESOURCE buffer;
 
-		hr = context->Map(m_TransformBuffer, 
+		hr = context->Map(transformBuffer,
 						  NULL,
 						  D3D11_MAP_WRITE_DISCARD,
 						  NULL,
@@ -117,7 +167,7 @@ void Renderer::SetTransforms(const Transform &transform)
 		Transform *to = reinterpret_cast<Transform *>(buffer.pData);
 		to->matrix = transform.matrix;
 
-		context->Unmap(m_TransformBuffer, 
+		context->Unmap(transformBuffer,
 					   NULL);
 	}
 }

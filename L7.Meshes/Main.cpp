@@ -117,14 +117,19 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	
 
 	auto triangle = TriangleMesh(1.0f, 1.0f, 0.0f);
-	rndr->AddGeometry(triangle);
+	rndr->AddGeometry(0, triangle);
 	
 	auto ms = DirectX::XMMatrixIdentity();
 	ms = DirectX::XMMatrixRotationAxis({{0.0f, 0.0f, 1.0f}}, 
 									   DirectX::XMConvertToRadians(90.0f));
 	Learnings::Transform transform{ DirectX::XMMatrixTranspose(ms) };
-	rndr->SetTransforms(transform);
-	rndr->SetTransforms(transform);
+	rndr->SetTransforms(0, 0, transform);
+
+	ms = DirectX::XMMatrixIdentity();
+	ms = DirectX::XMMatrixRotationAxis({ { 0.0f, 0.0f, 1.0f } },
+									   DirectX::XMConvertToRadians(-90.0f));
+	transform = { DirectX::XMMatrixTranspose(ms) };
+	rndr->SetTransforms(0, 1, transform);
 
 	auto vs = ReadBinaryFile(L"VertexShader.cso");
 	auto ps = ReadBinaryFile(L"PixelShader.cso");
