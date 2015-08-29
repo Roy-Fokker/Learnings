@@ -8,6 +8,7 @@ namespace Learnings
 {
 	struct Mesh;
 	struct Transform;
+	struct Projection;
 
 	class Renderer
 	{
@@ -22,6 +23,7 @@ namespace Learnings
 		void AddShader(const std::vector<byte> &vs, const std::vector<byte> &ps);
 		void AddTexture(const std::vector<byte> &tex);
 		void SetTransforms(const Transform &transform);
+		void SetProjection(const Projection &projection);
 
 	private:
 		std::unique_ptr<Learnings::Direct3d> m_d3d;
@@ -29,6 +31,8 @@ namespace Learnings
 		Direct3d::Buffer m_VertexBuffer;
 		Direct3d::Buffer m_IndexBuffer;
 		uint32_t m_IndexCount;
+
+		Direct3d::Buffer m_ProjectionBuffer;
 		Direct3d::Buffer m_TransformBuffer;
 
 		Direct3d::VertexShader m_VertexShader;

@@ -1,6 +1,11 @@
-cbuffer transform : register(b0)
+cbuffer frameBuffer : register(b0)
 {
-	matrix wrld;
+	matrix projection;
+}
+
+cbuffer transformBuffer : register(b1)
+{
+	matrix transform;
 }
 
 struct VS_INPUT
@@ -21,7 +26,8 @@ VS_OUTPUT main(VS_INPUT input)
 
 	input.pos.w = 1.0f;
 
-	output.pos = mul(input.pos, wrld);
+	output.pos = mul(input.pos, transform);
+	output.pos = mul(output.pos, projection);
 
 	output.uv = input.uv;
 	

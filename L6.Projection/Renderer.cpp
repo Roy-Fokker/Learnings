@@ -40,6 +40,9 @@ void Renderer::Draw()
 		
 		context->VSSetConstantBuffers(slot,
 									  count,
+									  &(m_ProjectionBuffer.p));
+		context->VSSetConstantBuffers(slot + 1,
+									  count,
 									  &(m_TransformBuffer.p));
 
 		context->DrawIndexed(m_IndexCount, 0, 0);
@@ -115,6 +118,37 @@ void Renderer::SetTransforms(const Transform &transform)
 		to->matrix = transform.matrix;
 
 		context->Unmap(m_TransformBuffer, 
+					   NULL);
+	}
+}
+
+void Renderer::SetProjection(const Projection &projection)
+{
+	if (!m_ProjectionBuffer)
+	{
+		m_ProjectionBuffer = m_d3d->CreateBuffer(sizeof(Transform),
+												&projection,
+												D3D11_BIND_CONSTANT_BUFFER,
+												D3D11_USAGE_DYNAMIC,
+												D3D11_CPU_ACCESS_WRITE);
+	}
+	else
+	{
+		auto context = m_d3d->GetContext();
+		HRESULT hr;
+		D3D11_MAPPED_SUBRESOURCE buffer;
+
+		hr = context->Map(m_ProjectionBuffer,
+						  NULL,
+						  D3D11_MAP_WRITE_DISCARD,
+						  NULL,
+						  &buffer);
+		assert(hr == S_OK && "constant buffer could not be locked"); // Do something here?????
+
+		Transform *to = reinterpret_cast<Transform *>(buffer.pData);
+		to->matrix = projection.matrix;
+
+		context->Unmap(m_ProjectionBuffer,
 					   NULL);
 	}
 }

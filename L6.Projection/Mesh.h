@@ -31,4 +31,9 @@ namespace Learnings
 	{
 		DirectX::XMMATRIX matrix;
 	};
+
+	struct Projection
+	{
+		DirectX::XMMATRIX matrix;
+	};
 }

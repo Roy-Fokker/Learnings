@@ -56,6 +56,26 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	std::unique_ptr<Learnings::Window> wnd;
 	std::unique_ptr<Learnings::Renderer> rndr;
 
+	auto updateProjection = [&](float width, float height, float dFov) -> void
+	{
+		if (!rndr)
+			return;
+
+		float aspectRatio = width / height;
+		float hFov = DirectX::XMConvertToRadians(dFov);
+		float vFov = 2 * atan(tan(hFov / 2.0f) * aspectRatio);
+		auto prespective = DirectX::XMMatrixPerspectiveFovLH(vFov, 
+															aspectRatio, 
+															0.1f, 
+															1000.0f);
+		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, 0.0f, -1.0f, 0.0f} },
+												  { {0.0f, 0.0f, 0.0f, 0.0f} },
+												  { { 0.0f, 1.0f, 0.0f, 0.0f } });
+		auto projection = viewFrom * prespective;
+		Learnings::Projection proj{ DirectX::XMMatrixTranspose(projection) };
+		rndr->SetProjection(proj);
+	};
+
 	auto callback = [&](Learnings::Window::Message msg, uint16_t v1, uint16_t v2) -> bool
 	{
 		if (!wnd)
@@ -76,10 +96,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 			case Window::Resized:
 				wnd->Restyle(Window::Style::Windowed);
 				rndr->Resize();
+				updateProjection(v1, v2, 60.0f);
 				break;
 			case Window::Maximized:
 				wnd->Restyle(Window::Style::Fullscreen);
 				rndr->Resize();
+				updateProjection(v1, v2, 60.0f);
 				break;
 			case Learnings::Window::Close:
 				return true;
