@@ -112,7 +112,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	};
 
 
-	wnd = std::make_unique<Learnings::Window>(800, 500, L"L5. Transformations", Learnings::Window::Style::Windowed, callback);
+	wnd = std::make_unique<Learnings::Window>(800, 500, L"L7. Meshes", Learnings::Window::Style::Windowed, callback);
 	rndr = std::make_unique<Learnings::Renderer>(wnd->m_hWnd);
 	
 
