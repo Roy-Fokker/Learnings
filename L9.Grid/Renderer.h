@@ -32,6 +32,7 @@ namespace Learnings
 		void AddShader(const std::vector<byte> &vs, const std::vector<byte> &ps);
 		void AddTexture(const std::vector<byte> &tex);
 		void SetTransforms(uint32_t meshId, uint32_t instanceId, const Transform &transform);
+		void SetTopology(uint32_t meshId, D3D11_PRIMITIVE_TOPOLOGY topology);
 		void SetProjection(const Projection &projection);
 
 	private:
@@ -44,6 +45,7 @@ namespace Learnings
 		std::vector<RenderableMesh> m_Meshes;
 		std::map<uint32_t, uint32_t> m_MeshIds;
 		std::multimap<uint32_t, Direct3d::Buffer> m_TransformBuffer;
+		std::map<uint32_t, D3D11_PRIMITIVE_TOPOLOGY> m_TopologyRules;
 
 		Direct3d::Buffer m_ProjectionBuffer;
 

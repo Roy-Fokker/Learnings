@@ -48,11 +48,11 @@ Learnings::Mesh TriangleMesh (float base, float height, float delta)
 	};
 }
 
-Learnings::Mesh GridMesh(uint32_t cellSize, uint32_t cellCount)
+Learnings::Mesh GridMesh(float cellSize, uint32_t cellCount)
 {
 	using namespace Learnings;
 
-	auto startxy = cellSize * (float)cellCount / 2.0f;
+	auto startxy = cellSize * cellCount / 2.0f;
 	Vertex vStart{ {-startxy, 0.0f, -startxy}, {0.0f, 0.0f} };
 	Vertex vEnd{ { -startxy, 0.0f, startxy },{ 0.0f, 0.0f } };
 
@@ -112,7 +112,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 															aspectRatio, 
 															0.1f, 
 															1000.0f);
-		auto viewFrom = DirectX::XMMatrixLookAtLH({ {5.0f, 5.0f, -5.0f, 0.0f} },
+		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, 1.0f, -1.0f, 0.0f} },
 												  { {0.0f, 0.0f, 0.0f, 0.0f} },
 												  { { 0.0f, 1.0f, 0.0f, 0.0f } });
 		auto projection = viewFrom * prespective;
@@ -163,9 +163,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	uint32_t triangleIdx = 0;
 	rndr->AddGeometry(triangleIdx, triangle);
 
-	auto grid = GridMesh(1, 10);
+	auto grid = GridMesh(0.5f, 10);
 	uint32_t gridIdx = 1;
 	rndr->AddGeometry(gridIdx, grid);
+	rndr->SetTopology(gridIdx, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	
 	auto ms = DirectX::XMMatrixIdentity();
 	ms = DirectX::XMMatrixRotationAxis({{0.0f, 0.0f, 1.0f}}, 

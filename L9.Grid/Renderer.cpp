@@ -40,14 +40,23 @@ void Renderer::Draw()
 		context->PSSetShaderResources(0, 1, &(m_ShaderResourceView.p));
 
 		context->IASetInputLayout(m_InputLayout);
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-
+		
 		context->VSSetConstantBuffers(slot,
 									  count,
 									  &(m_ProjectionBuffer.p));
 
 		for (auto &mesh : m_Meshes)
 		{
+			auto it = m_TopologyRules.find(mesh.id);
+			if (it != m_TopologyRules.end())
+			{
+				context->IASetPrimitiveTopology(it->second);
+			}
+			else
+			{
+				context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			}
+
 			context->IASetVertexBuffers(0,
 										1,
 										&(mesh.vertexBuffer.p),
@@ -88,6 +97,7 @@ void Renderer::AddGeometry(uint32_t meshId, const Mesh &mesh)
 	}
 	else
 	{
+		m_MeshIds[mId] = meshId;
 		m_Meshes.push_back(RenderableMesh());
 	}
 
@@ -174,6 +184,18 @@ void Renderer::SetTransforms(uint32_t meshId, uint32_t instanceId, const Transfo
 		context->Unmap(transformBuffer,
 					   NULL);
 	}
+}
+
+void Learnings::Renderer::SetTopology(uint32_t meshId, D3D11_PRIMITIVE_TOPOLOGY topology)
+{
+	auto it = m_MeshIds.find(meshId);
+
+	if (it == m_MeshIds.end())
+	{
+		return;
+	}
+
+	m_TopologyRules[meshId] = topology;
 }
 
 void Renderer::SetProjection(const Projection &projection)
