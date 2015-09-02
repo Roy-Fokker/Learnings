@@ -83,7 +83,7 @@ namespace Learnings
 		DepthStencilBuffer m_DepthStencilBuffer;
 		DepthStencilView m_DepthStencilView;
 
-		BOOL m_vSync = TRUE;
+		BOOL m_vSync = FALSE;
 
 		HWND m_hWnd;
 	};
