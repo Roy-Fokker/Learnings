@@ -14,10 +14,10 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Shaders">
-      <UniqueIdentifier>{7c437670-5583-444e-b8c3-aa8bf4713493}</UniqueIdentifier>
+      <UniqueIdentifier>{57cf7423-c9f8-4b98-ad1a-d1a7d8a93848}</UniqueIdentifier>
     </Filter>
     <Filter Include="Textures">
-      <UniqueIdentifier>{a3b9c096-a5b4-4f93-9303-90e8f6811fc4}</UniqueIdentifier>
+      <UniqueIdentifier>{923e8d24-7a6c-4ba0-b36a-4c8080dd328c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -55,16 +55,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="VertexShader.hlsl">
+    <FxCompile Include="PixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="PixelShader.hlsl">
+    <FxCompile Include="VertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ImageContentTask Include="uv_grid.dds">
+    <Image Include="uv_grid.dds">
       <Filter>Textures</Filter>
-    </ImageContentTask>
+    </Image>
   </ItemGroup>
 </Project>
