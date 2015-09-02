@@ -46,7 +46,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 															aspectRatio, 
 															0.1f, 
 															1000.0f);
-		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, 1.0f, 1.0f, 0.0f} },
+		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, -1.0f, 1.0f, 0.0f} },
 												  { {0.0f, 0.0f, 0.0f, 0.0f} },
 												  { { 0.0f, 1.0f, 0.0f, 0.0f } });
 		auto projection = viewFrom * prespective;
@@ -93,8 +93,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	wnd = std::make_unique<Learnings::Window>(800, 500, L"L10. Basic Shapes", Learnings::Window::Style::Windowed, callback);
 	rndr = std::make_unique<Learnings::Renderer>(wnd->m_hWnd);
 	
-	auto shape = Learnings::Triangle(1.0f, 1.0f, 0.0f);
+	//auto shape = Learnings::Triangle(1.0f, 1.0f, 0.0f);
 	//auto shape = Learnings::Rectangle(1.0f, 1.0f);
+	auto shape = Learnings::Box(1.0f, 1.0f, 1.0f);
 	uint32_t shapeIdx = 0;
 	rndr->AddGeometry(shapeIdx, shape);
 

@@ -31,18 +31,14 @@ Mesh Learnings::Rectangle(float length, float width)
 {
 	float l = length / 2.0f;
 	float w = width / 2.0f;
-	float x1 = -l, y1 = -w,
-		x2 = l, y2 = -w,
-		x3 = l, y3 = w,
-		x4 = -l, y4 = w;
 
 	return{
 		// Vertex List
 		{
-			{ { x1, y1, 0.0f },{ 0.0f, 0.0f } },
-			{ { x2, y2, 0.0f },{ 1.0f, 0.0f } },
-			{ { x3, y3, 0.0f },{ 1.0f, 1.0f } },
-			{ { x4, y4, 0.0f },{ 0.0f, 1.0f } },
+			{ { -l, -w, 0.0f },{ 0.0f, 0.0f } },
+			{ { +l, -w, 0.0f },{ 1.0f, 0.0f } },
+			{ { +l, +w, 0.0f },{ 1.0f, 1.0f } },
+			{ { -l, +w, 0.0f },{ 0.0f, 1.0f } },
 		},
 
 		// Index List
@@ -55,7 +51,67 @@ Mesh Learnings::Rectangle(float length, float width)
 
 Mesh Learnings::Box(float length, float width, float height)
 {
-	return Mesh();
+	float l = length / 2.0f;
+	float w = width / 2.0f;
+	float h = height / 2.0f;
+
+	return{
+		// Vertex List
+		{
+			// Front
+			{ { -l, -w, +h },{ 0.0f, 0.0f } },
+			{ { +l, -w, +h },{ 1.0f, 0.0f } },
+			{ { +l, +w, +h },{ 1.0f, 1.0f } },
+			{ { -l, +w, +h },{ 0.0f, 1.0f } },
+
+			// Bottom
+			{ { -l, -w, -h },{ 0.0f, 0.0f } },
+			{ { +l, -w, -h },{ 1.0f, 0.0f } },
+			{ { +l, -w, +h },{ 1.0f, 1.0f } },
+			{ { -l, -w, +h },{ 0.0f, 1.0f } },
+
+			// Right
+			{ { +l, -w, -h },{ 0.0f, 0.0f } },
+			{ { +l, +w, -h },{ 1.0f, 0.0f } },
+			{ { +l, +w, +h },{ 1.0f, 1.0f } },
+			{ { +l, -w, +h },{ 0.0f, 1.0f } },
+
+			// Left
+			{ { -l, -w, -h },{ 0.0f, 0.0f } },
+			{ { -l, -w, +h },{ 1.0f, 0.0f } },
+			{ { -l, +w, +h },{ 1.0f, 1.0f } },
+			{ { -l, +w, -h },{ 0.0f, 1.0f } },
+
+			// Back
+			{ { -l, -w, -h },{ 0.0f, 0.0f } },
+			{ { -l, +w, -h },{ 1.0f, 0.0f } },
+			{ { +l, +w, -h },{ 1.0f, 1.0f } },
+			{ { +l, -w, -h },{ 0.0f, 1.0f } },
+
+			// Top
+			{ { -l, +w, -h },{ 0.0f, 0.0f } },
+			{ { -l, +w, +h },{ 1.0f, 0.0f } },
+			{ { +l, +w, +h },{ 1.0f, 1.0f } },
+			{ { +l, +w, -h },{ 0.0f, 1.0f } },
+		},
+
+
+		// Index List
+		{
+			// Front
+			0, 1, 2, 0, 2, 3,
+			// Bottom
+			4, 5, 6, 4, 6, 7,
+			// Right
+			8, 9, 10, 8, 10, 11,
+			// Left
+			12, 13, 14, 12, 14, 15,
+			// Back
+			16, 17, 18, 16, 18, 19,
+			// Top
+			20, 21, 22, 20, 22, 23,
+		}
+	};
 }
 
 Mesh Learnings::Tetrahedron(float radius)
