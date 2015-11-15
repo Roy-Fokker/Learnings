@@ -1,8 +1,13 @@
+#include <math.h>
+#include <DirectXMath.h>
+
+
 #include "BasicShapes.h"
 
 #include "Mesh.h"
 
 using namespace Learnings;
+namespace Math = DirectX;
 
 Mesh Learnings::Triangle(float base, float height, float tipOffset)
 {
@@ -116,7 +121,41 @@ Mesh Learnings::Box(float length, float width, float height)
 
 Mesh Learnings::Tetrahedron(float radius)
 {
-	return Mesh();
+	Mesh shape;
+	float angle = -19.471220333f; // Where does this come from??
+	float phi = Math::XMConvertToRadians(angle);
+	
+
+	shape.vertices.resize(4);
+
+	shape.vertices[0] = { {0.0f, radius, 0.0f}, {0.0f, 0.5f} };
+
+	float theta = 0.0f;
+	for (int i = 1; i < 4; i++)
+	{
+		float x, y, z, v;
+
+		x = radius * std::cosf(theta) * std::cosf(phi);
+		y = radius * std::sinf(phi);
+		z = radius * std::sinf(theta) * std::cosf(phi);
+
+		v = sinf(theta);
+
+		shape.vertices[i] = {
+			{ x, y, z }, {1.0f, v}
+		};
+
+		theta += Math::XMConvertToRadians(120.0f);
+	}
+
+	shape.indices = {
+		0, 2, 1,
+		0, 3, 2,
+		0, 1, 3,
+		1, 2, 3
+	};
+
+	return shape;
 }
 
 Mesh Learnings::Octahedron(float radius)
