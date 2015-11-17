@@ -46,7 +46,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 															aspectRatio, 
 															0.1f, 
 															1000.0f);
-		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, -1.0f, -1.0f, 0.0f} },
+		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, 0.0f, -1.0f, 0.0f} },
 												  { {0.0f, 0.0f, 0.0f, 0.0f} },
 												  { { 0.0f, 1.0f, 0.0f, 0.0f } });
 		auto projection = viewFrom * prespective;
@@ -107,6 +107,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	
 	auto ms = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 	Learnings::Transform transform{ DirectX::XMMatrixTranspose(ms) };
+	//rndr->SetTopology(shapeIdx, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	rndr->SetTransforms(shapeIdx, 0, transform);
 
 	ms = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
@@ -124,7 +125,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	// Main Loop
 	while (wnd->ProcessMessages())
 	{
+		static float i = 0.0f;
+		if (i > 360.0f) i = 0.0f;
+		float a = DirectX::XMConvertToRadians(i);
+		ms = DirectX::XMMatrixRotationY(a);
+		transform = { DirectX::XMMatrixTranspose(ms) };
+		rndr->SetTransforms(shapeIdx, 0, transform);
+
 		rndr->Draw();
+
+		i += 0.005f;
 	}
 
 	CoUninitialize();

@@ -122,37 +122,48 @@ Mesh Learnings::Box(float length, float width, float height)
 Mesh Learnings::Tetrahedron(float radius)
 {
 	Mesh shape;
-	float angle = -19.471220333f; // Where does this come from??
-	float phi = Math::XMConvertToRadians(angle);
+
+	shape.vertices.push_back(Vertex{ {0.0f, radius, 0.0f}, {0.0f, 0.0f} });
 	
-
-	shape.vertices.resize(4);
-
-	shape.vertices[0] = { {0.0f, radius, 0.0f}, {0.0f, 0.5f} };
-
+	uint8_t basePointCnt = 3;
+	float angle = Math::XM_2PI / basePointCnt; // number of point in base
 	float theta = 0.0f;
-	for (int i = 1; i < 4; i++)
+	for (uint8_t i = 0; i < basePointCnt; i++)
 	{
-		float x, y, z, v;
+		float x, y, z;
+		x = radius * std::cosf(theta); 
+		y = radius * std::cosf(angle);
+		z = radius * std::sinf(theta); 
 
-		x = radius * std::cosf(theta) * std::cosf(phi);
-		y = radius * std::sinf(phi);
-		z = radius * std::sinf(theta) * std::cosf(phi);
+		theta += angle;
 
-		v = sinf(theta);
+		shape.vertices.push_back(Vertex{ {x, y, z}, {0.0f, 0.0f} });
+	}
 
-		shape.vertices[i] = {
-			{ x, y, z }, {1.0f, v}
-		};
+	// duplicate points for nicer UV map
+	auto v0 = shape.vertices[0],
+		v1 = shape.vertices[1];
+	shape.vertices.insert(shape.vertices.end(), { v0, v1 });
 
-		theta += Math::XMConvertToRadians(120.0f);
+	// Map UV -> |/\/\/|
+	for (uint8_t i = 0; i < 6; i++)
+	{
+		float u, v = 0.0f;
+		if (i % 2 == 0)
+		{
+			v = 1.0f;
+		}
+
+		u = i / 6.0f;
+
+		shape.vertices[i].texCoord = { u, v };
 	}
 
 	shape.indices = {
 		0, 2, 1,
-		0, 3, 2,
-		0, 1, 3,
-		1, 2, 3
+		1, 2, 3,
+		2, 4, 3, 
+		3, 4, 5
 	};
 
 	return shape;
