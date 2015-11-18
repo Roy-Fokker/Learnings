@@ -171,7 +171,28 @@ Mesh Learnings::Tetrahedron(float radius)
 
 Mesh Learnings::Octahedron(float radius)
 {
-	return Mesh();
+	return{
+		{
+			{ { radius, 0.0f, 0.0f },{ 0.0f, 0.5f } },
+			{ { 0.0f, radius, 0.0f },{ 0.5f, 0.0f } },
+			{ { 0.0f, 0.0f, radius },{ 0.33f, 0.5f } },
+			{ { -radius, 0.0f, 0.0f },{ 0.66f, 0.5f } },
+			{ { 0.0f, -radius, 0.0f },{ 0.5f, 1.0f } },
+			{ { 0.0f, 0.0f, -radius },{ 1.0f, 0.5f } },
+		},
+		{
+			// Top
+			0, 1, 2,
+			2, 1, 3,
+			3, 1, 5,
+			5, 1, 0,
+			// Bottom
+			2, 4, 0,
+			3, 4, 2,
+			5, 4, 3,
+			0, 4, 5
+		}
+	};
 }
 
 Mesh Learnings::Icosahedron(float radius, uint16_t subdivide)
