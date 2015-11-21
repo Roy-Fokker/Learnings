@@ -208,7 +208,88 @@ Mesh Learnings::Dodecahedron(float radius, uint16_t subdivide)
 
 Mesh Learnings::Sphere(float radius, uint16_t slices, uint16_t stacks)
 {
-	return Mesh();
+	Mesh shape;
+
+	float r = radius;
+	float dp = Math::XM_PI / stacks;
+	float dt = Math::XM_2PI / slices;
+
+	shape.vertices.push_back(Vertex{
+		{0.0f, r, 0.0f}, { 0.0f, 0.0f }
+	});
+
+	for (UINT stack = 1; stack < stacks; stack++)
+	{
+		float phi = stack * dp;
+
+		for (UINT slice = 0; slice < slices; slice++)
+		{
+			float theta = slice * dt;
+
+			float x, y, z;
+			x = r * sinf(phi) * cosf(theta);
+			y = r * cosf(phi);
+			z = r * sinf(phi) * sinf(theta);
+
+			
+			float u, v;
+			u = 0.5 + atan2(z, x) / Math::XM_2PI;
+			v = 0.5 + asin(y) / Math::XM_PI;
+
+			shape.vertices.push_back(Vertex{
+				{ x, y, z },{ u, v }
+			});
+		}
+	}
+	shape.vertices.push_back(Vertex{
+		{ 0.0f, -r, 0.0f },{ 0.0f, 1.0f }
+	});
+
+	// Faces for North Pole
+	for (UINT i = 1; i <= slices; i++)
+	{
+		shape.indices.insert(shape.indices.end(), {
+			0, 
+			(i == slices) ? 1 : i + 1,
+			i
+		});
+	}
+
+	// Faces for Stuff inbetween
+	for (UINT j = 0; j < stacks - 2; j++)
+	{
+		UINT offset = j * slices + 1;
+		for (UINT i = 0; i < slices; i++)
+		{
+			bool lastSlice = !((offset + i) < ((j + 1) * slices));
+			shape.indices.insert(shape.indices.end(), {
+				offset + i,
+				(lastSlice) ? offset : offset + i + 1,
+				offset + i + slices
+			});
+
+			shape.indices.insert(shape.indices.end(), {
+				offset + i + slices,
+				(lastSlice) ? offset : offset + i + 1,
+				(lastSlice) ? offset + slices : offset + i + 1 + slices
+			});
+		}
+	}
+
+	// Faces for South Pole
+	UINT spIdx = shape.vertices.size() - 1;
+	UINT spOffset = spIdx - slices - 1;
+	for (UINT i = 1; i <= slices; i++)
+	{
+		UINT idx = spOffset + i;
+		shape.indices.insert(shape.indices.end(), {
+			spIdx,
+			(i == slices) ? idx : idx,
+			(i == slices) ? spOffset + 1 : idx + 1
+		});
+	}
+
+	return shape;
 }
 
 Mesh Learnings::Cylinder(float radiusTop, float radiusBottom, float height, uint16_t slices, bool cap)
