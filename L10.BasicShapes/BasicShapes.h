@@ -14,6 +14,6 @@ namespace Learnings
 	Mesh Icosahedron(float radius, uint16_t subdivide);
 	Mesh Dodecahedron(float radius, uint16_t subdivide);
 	Mesh Sphere(float radius, uint16_t slices, uint16_t stacks);
-	Mesh Cylinder(float radius, float height);
+	Mesh Cylinder(float radiusTop, float radiusBottom, float height, uint16_t slices, bool cap);
 	Mesh Grid(float cellSize, uint16_t cellCount);
 }

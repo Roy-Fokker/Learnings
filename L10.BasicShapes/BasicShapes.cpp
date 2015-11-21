@@ -149,13 +149,14 @@ Mesh Learnings::Tetrahedron(float radius)
 	for (uint8_t i = 0; i < 6; i++)
 	{
 		float u, v = 0.0f;
+		
 		if (i % 2 == 0)
 		{
 			v = 1.0f;
 		}
 
 		u = i / 6.0f;
-
+		
 		shape.vertices[i].texCoord = { u, v };
 	}
 
@@ -210,9 +211,103 @@ Mesh Learnings::Sphere(float radius, uint16_t slices, uint16_t stacks)
 	return Mesh();
 }
 
-Mesh Learnings::Cylinder(float radius, float height)
+Mesh Learnings::Cylinder(float radiusTop, float radiusBottom, float height, uint16_t slices, bool cap)
 {
-	return Mesh();
+	Mesh shape;
+
+	float h = height / 2.0f;
+	float angle = Math::XM_2PI / slices;
+	
+	uint32_t cnt = 0;
+	// Cap
+	if (cap)
+	{
+		// Top
+		for (uint16_t i = 0; i < slices; i++)
+		{
+			float x, y, z;
+			float u, v;
+
+			x = radiusTop * std::cosf(i * angle);
+			z = radiusTop * std::sinf(i * angle);
+			y = h;
+
+			u = 0.25f * std::cosf(i * angle) + 0.25f;
+			v = 0.25f * std::sinf(i * angle) + 0.25f;
+
+			shape.vertices.push_back(Vertex{ { x, y, z },{ u, v } });
+		}
+
+		for (uint16_t i = 1; i < slices - 1; i++)
+		{
+			uint32_t n = i;
+			shape.indices.insert(shape.indices.end(), {
+				n + 1, n, 0
+			});
+		}
+		
+
+		cnt = shape.vertices.size();
+		
+		// Bottom
+		for (uint16_t i = 0; i < slices; i++)
+		{
+			float x, y, z;
+			float u, v;
+
+			x = radiusBottom * std::cosf(i * angle);
+			z = radiusBottom * std::sinf(i * angle);
+			y = -h;
+
+			u = 0.25f * std::cosf(i * angle) + 0.75f;
+			v = 0.25f * std::sinf(i * angle) + 0.25f;
+
+			shape.vertices.push_back(Vertex{ { x, y, z },{ u, v } });
+		}
+
+		for (uint16_t i = 1; i < slices - 1; i++)
+		{
+			uint32_t n = i + cnt;
+			shape.indices.insert(shape.indices.end(), {
+				cnt, n, n + 1
+			});
+		}
+
+		cnt = shape.vertices.size();
+	}
+
+	// Body
+	for (uint16_t i = 0; i <= slices; i++)
+	{
+		float x, y, z;
+		float u = 1.0f / slices * i;
+		float v = cap ? 0.5f : 0.0f;
+
+		// Top
+		x = radiusTop * std::cosf(i * angle);
+		z = radiusTop * std::sinf(i * angle);
+		y = h;
+
+		shape.vertices.push_back(Vertex{ {x, y, z}, {u, v} });
+
+		// Bottom
+		x = radiusBottom * std::cosf(i * angle);
+		z = radiusBottom * std::sinf(i * angle);
+		y = -h;
+
+		shape.vertices.push_back(Vertex{ { x, y, z },{ u, 1.0f } });
+	}
+
+	for (uint16_t i = 0; i < slices; i++)
+	{
+		uint32_t n = i * 2 + cnt;
+		shape.indices.insert(shape.indices.end(), {
+			n, n + 2, n + 1,
+			n + 1, n + 2, n + 3
+		});
+	}
+
+	return shape;
 }
 
 Mesh Learnings::Grid(float cellSize, uint16_t cellCount)
