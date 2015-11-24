@@ -214,27 +214,30 @@ Mesh Learnings::Sphere(float radius, uint16_t slices, uint16_t stacks)
 	float dp = Math::XM_PI / stacks;
 	float dt = Math::XM_2PI / slices;
 
+	float du = 1.0f / slices;
+	float dv = 1.0f / stacks;
+
 	shape.vertices.push_back(Vertex{
 		{0.0f, r, 0.0f}, { 0.0f, 0.0f }
 	});
 
-	for (UINT stack = 1; stack < stacks; stack++)
+	for (uint32_t stack = 1; stack < stacks; stack++)
 	{
+		float v = dv * stack;
 		float phi = stack * dp;
 
-		for (UINT slice = 0; slice < slices; slice++)
+		for (uint32_t slice = 0; slice < slices; slice++)
 		{
 			float theta = slice * dt;
 
 			float x, y, z;
-			x = r * sinf(phi) * cosf(theta);
-			y = r * cosf(phi);
-			z = r * sinf(phi) * sinf(theta);
+			x = r * std::sinf(phi) * std::cosf(theta);
+			y = r * std::cosf(phi);
+			z = r * std::sinf(phi) * std::sinf(theta);
 
 			
-			float u, v;
-			u = 0.5 + atan2(z, x) / Math::XM_2PI;
-			v = 0.5 + asin(y) / Math::XM_PI;
+			float u;
+			u = du * slice;
 
 			shape.vertices.push_back(Vertex{
 				{ x, y, z },{ u, v }
@@ -246,7 +249,7 @@ Mesh Learnings::Sphere(float radius, uint16_t slices, uint16_t stacks)
 	});
 
 	// Faces for North Pole
-	for (UINT i = 1; i <= slices; i++)
+	for (uint32_t i = 1; i <= slices; i++)
 	{
 		shape.indices.insert(shape.indices.end(), {
 			0, 
@@ -256,10 +259,10 @@ Mesh Learnings::Sphere(float radius, uint16_t slices, uint16_t stacks)
 	}
 
 	// Faces for Stuff inbetween
-	for (UINT j = 0; j < stacks - 2; j++)
+	for (uint32_t j = 0; j < stacks - 2u; j++)
 	{
-		UINT offset = j * slices + 1;
-		for (UINT i = 0; i < slices; i++)
+		uint32_t offset = j * slices + 1;
+		for (uint32_t i = 0; i < slices; i++)
 		{
 			bool lastSlice = !((offset + i) < ((j + 1) * slices));
 			shape.indices.insert(shape.indices.end(), {
@@ -277,11 +280,11 @@ Mesh Learnings::Sphere(float radius, uint16_t slices, uint16_t stacks)
 	}
 
 	// Faces for South Pole
-	UINT spIdx = shape.vertices.size() - 1;
-	UINT spOffset = spIdx - slices - 1;
-	for (UINT i = 1; i <= slices; i++)
+	uint32_t spIdx = shape.vertices.size() - 1;
+	uint32_t spOffset = spIdx - slices - 1;
+	for (uint32_t i = 1; i <= slices; i++)
 	{
-		UINT idx = spOffset + i;
+		uint32_t idx = spOffset + i;
 		shape.indices.insert(shape.indices.end(), {
 			spIdx,
 			(i == slices) ? idx : idx,
