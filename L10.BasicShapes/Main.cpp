@@ -99,7 +99,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	//auto shape = Learnings::Tetrahedron(1.0f);
 	//auto shape = Learnings::Octahedron(1.0f);
 	//auto shape = Learnings::Cylinder(0.5f, 0.5f, 1.0f, 10, true);
-	auto shape = Learnings::Sphere(0.5f, 120, 120);
+	//auto shape = Learnings::Sphere(0.5f, 120, 120);
+	auto shape = Learnings::Icosahedron(1.0f, 1);
 	uint32_t shapeIdx = 0;
 	rndr->AddGeometry(shapeIdx, shape);
 

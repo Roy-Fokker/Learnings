@@ -198,7 +198,50 @@ Mesh Learnings::Octahedron(float radius)
 
 Mesh Learnings::Icosahedron(float radius, uint16_t subdivide)
 {
-	return Mesh();
+	Mesh shape;
+
+	float sqrt5 = std::sqrtf(5.0f);
+	float tau = (1.0f + sqrt5) / 2.0f;
+
+	float edgeRadius = std::sqrtf(10.0f + (2.0f * sqrt5)) / (4.0f * tau);
+	float a = (radius / edgeRadius) / 2.0f;
+	float b = (radius / edgeRadius) / (2.0f * tau);
+
+	shape.vertices = {
+		{ {  0,  b, -a }, { 0.0f, 0.0f } },
+		{ {  b,  a,  0 }, { 0.0f, 0.0f } },
+		{ { -b,  a,  0 }, { 0.0f, 0.0f } },
+		{ {  0,  b,  a }, { 0.0f, 0.0f } },
+		{ {  0, -b,  a }, { 0.0f, 0.0f } },
+		{ { -a,  0,  b }, { 0.0f, 0.0f } },
+		{ {  0, -b, -a }, { 0.0f, 0.0f } },
+		{ {  a,  0, -b }, { 0.0f, 0.0f } },
+		{ {  a,  0,  b }, { 0.0f, 0.0f } },
+		{ { -a,  0, -b }, { 0.0f, 0.0f } },
+		{ {  b, -a,  0 }, { 0.0f, 0.0f } },
+		{ { -b, -a,  0 }, { 0.0f, 0.0f } },
+	};
+
+	shape.indices = {
+		1, 0,  2, 	 2,  3,  1, 	  4, 3,  5, 	  8,  3,  4,
+		6, 0,  7, 	 9,  0,  6, 	 10, 4, 11, 	 11,  6, 10,
+		5, 2,  9, 	 9, 11,  5, 	  7, 1,  8, 	  8, 10,  7,
+		5, 3,  2,	 1,  3,  8, 	  2, 0,  9, 	  7,  0,  1,
+		9, 6, 11,	10,  6,  7, 	 11, 4,  5, 	  8,  4, 10
+	};
+
+
+	for (auto &vtx : shape.vertices)
+	{
+		float theta = 0.5f + std::atan2f(vtx.position.y, vtx.position.x) / Math::XM_2PI;
+		float phi = 0.5f - std::asinf(vtx.position.z) / Math::XM_PI;
+
+		vtx.texCoord = { theta, phi };
+	}
+
+
+
+	return shape;
 }
 
 Mesh Learnings::Dodecahedron(float radius, uint16_t subdivide)
