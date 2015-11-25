@@ -9,6 +9,80 @@
 using namespace Learnings;
 namespace Math = DirectX;
 
+static Mesh SubDivideMesh(Mesh mesh, uint16_t level)
+{
+	if (level < 1)
+	{
+		return mesh;
+	}
+
+	if (level > 1)
+	{
+		mesh = SubDivideMesh(mesh, level - 1);
+	}
+
+	Mesh subdMesh;
+	auto numTriangles = mesh.indices.size() / 3u;
+
+	for (decltype(numTriangles) i = 0; i < numTriangles; i++)
+	{
+		Vertex v0 = mesh.vertices[mesh.indices[i * 3]],
+			v1 = mesh.vertices[mesh.indices[i * 3 + 1]],
+			v2 = mesh.vertices[mesh.indices[i * 3 + 2]];
+
+		Vertex m0, m1, m2;
+		m0 = {
+			{
+				0.5f * (v0.position.x + v1.position.x),
+				0.5f * (v0.position.y + v1.position.y),
+				0.5f * (v0.position.z + v1.position.z)
+			},
+			{
+				0.5f * (v0.texCoord.x + v1.texCoord.x),
+				0.5f * (v0.position.y + v1.texCoord.y)
+			}
+		};
+
+		m1 = {
+			{
+				0.5f * (v1.position.x + v2.position.x),
+				0.5f * (v1.position.y + v2.position.y),
+				0.5f * (v1.position.z + v2.position.z)
+			},
+			{
+				0.5f * (v1.texCoord.x + v2.texCoord.x),
+				0.5f * (v1.position.y + v2.texCoord.y)
+			}
+		};
+
+		m2 = {
+			{
+				0.5f * (v0.position.x + v2.position.x),
+				0.5f * (v0.position.y + v2.position.y),
+				0.5f * (v0.position.z + v2.position.z)
+			},
+			{
+				0.5f * (v0.texCoord.x + v2.texCoord.x),
+				0.5f * (v0.position.y + v2.texCoord.y)
+			}
+		};
+
+		subdMesh.vertices.insert(subdMesh.vertices.end(), {
+			v0, v1, v2, m0, m1, m2
+		});
+
+		uint32_t n = i * 6u;
+		subdMesh.indices.insert(subdMesh.indices.end(), {
+			n + 0, n + 3, n + 5,
+			n + 3, n + 4, n + 5,
+			n + 5, n + 4, n + 2,
+			n + 3, n + 1, n + 4
+		});
+	}
+
+	return subdMesh;
+}
+
 Mesh Learnings::Triangle(float base, float height, float tipOffset)
 {
 	float halfHeight = height / 2.0f;
@@ -203,11 +277,45 @@ Mesh Learnings::Icosahedron(float radius, uint16_t subdivide)
 	float sqrt5 = std::sqrtf(5.0f);
 	float tau = (1.0f + sqrt5) / 2.0f;
 
-	float edgeRadius = std::sqrtf(10.0f + (2.0f * sqrt5)) / (4.0f * tau);
-	float a = (radius / edgeRadius) / 2.0f;
-	float b = (radius / edgeRadius) / (2.0f * tau);
+	float a = 1.0f;
+	float b = a * tau;
 
+	float du = 5.5f; // number of points horizontally
+	float dv = 3.0f; // number of points vertically
+	/*
+	float edgeRadius = std::sqrtf(10.0f + (2.0f * sqrt5)) / (4.0f * tau);
+	float a = (1.0f / edgeRadius) / 2.0f;
+	float b = (1.0f / edgeRadius) / (2.0f * tau);
+	*/
 	shape.vertices = {
+		{ {-a,  b, 0}, {0.5f / du, 0.0f} }, // 0
+		{ { a,  b, 0}, {2.0f / du, 1.0f / dv} }, // 1
+		{ {-a, -b, 0}, {4.5f / du, 2.0f / dv} }, // 2
+		{ { a, -b, 0}, {1.0f / du, 1.0f} }, // 3
+
+		{ {0, -a,  b}, {0.5f / du, 2.0f / dv} }, // 4
+		{ {0,  a,  b}, {1.0f / du, 1.0f / dv} }, // 5
+		{ {0, -a, -b}, {3.5f / du, 2.0f / dv} }, // 6
+		{ {0,  a, -b}, {3.0f / du, 1.0f / dv } }, // 7
+
+		{ { b, 0, -a}, {2.5f / du, 2.0f / dv} }, // 8
+		{ { b, 0,  a}, {1.5f / du, 2.0f / dv} }, // 9
+		{ {-b, 0, -a}, {4.0f / du, 1.0f / dv } }, // 10
+		{ {-b, 0,  a}, {0.0f, 1.0f / dv} }, // 11
+		
+
+		// duplicates
+		{ { -a,  b,  0 }, { 1.5f / du, 0.0f } }, // 12 - 0 vertex
+		{ { -a,  b,  0 }, { 2.5f / du, 0.0f } }, // 13 - 0 vertex
+		{ { -a,  b,  0 }, { 3.5f / du, 0.0f } }, // 14 - 0 vertex
+		{ { -a,  b,  0 }, { 4.5f / du, 0.0f } }, // 15 - 0 vertex
+		{ { -b,  0,  a }, { 5.0f / du, 1.0f / dv } }, // 16 -  11 vertex
+		{ {  0, -a,  b }, { 1.0f, 2.0f / dv } }, // 17 - 4 vertex
+		{ {  a, -b,  0 }, { 2.0f / du, 1.0f } }, // 18 - 3 vertex
+		{ {  a, -b,  0 }, { 3.0f / du, 1.0f } }, // 19 - 3 vertex
+		{ {  a, -b,  0 }, { 4.0f / du, 1.0f } }, // 20 - 3 vertex
+		{ {  a, -b,  0 }, { 5.0f / du, 1.0f } }, // 21 - 3 vertex
+		/*
 		{ {  0,  b, -a }, { 0.0f, 0.0f } },
 		{ {  b,  a,  0 }, { 0.0f, 0.0f } },
 		{ { -b,  a,  0 }, { 0.0f, 0.0f } },
@@ -220,25 +328,75 @@ Mesh Learnings::Icosahedron(float radius, uint16_t subdivide)
 		{ { -a,  0, -b }, { 0.0f, 0.0f } },
 		{ {  b, -a,  0 }, { 0.0f, 0.0f } },
 		{ { -b, -a,  0 }, { 0.0f, 0.0f } },
+		*/
 	};
 
 	shape.indices = {
-		1, 0,  2, 	 2,  3,  1, 	  4, 3,  5, 	  8,  3,  4,
-		6, 0,  7, 	 9,  0,  6, 	 10, 4, 11, 	 11,  6, 10,
-		5, 2,  9, 	 9, 11,  5, 	  7, 1,  8, 	  8, 10,  7,
-		5, 3,  2,	 1,  3,  8, 	  2, 0,  9, 	  7,  0,  1,
-		9, 6, 11,	10,  6,  7, 	 11, 4,  5, 	  8,  4, 10
+		 0, 11,  5,
+		12,  5,  1,  // 0 5 1
+		13,  1,  7,  // 0 1 7
+		14,  7, 10,  // 0 7 10
+		15, 10, 16,  // 0 10 11
+
+		 1,  5, 9,
+		 5, 11, 4, 
+		16, 10, 2, // 11 10 2
+		10,  7, 6,
+		 7,  1, 8,
+
+		3,  9, 4, // 3, 9, 4,
+		21, 17, 2, // 3, 4, 2,
+		20,  2, 6, // 3, 2, 6,
+		19,  6, 8, // 3, 6, 8,
+		18,  8, 9, // 3, 8, 9,
+
+		4, 9, 5, 
+		2, 4, 16, // 2 4 11
+		6, 2, 10,
+		8, 6, 7,
+		9, 8, 1
+		 /*
+		 1,  0,  2,
+		 2,  3,  1,
+		 4,  3,  5,
+		 8,  3,  4,
+		 6,  0,  7,
+		 9,  0,  6, 
+		10,  4, 11,
+		11,  6, 10,
+		 5,  2,  9,
+		 9, 11,  5, 
+		 7,  1,  8,
+		 8, 10,  7,
+		 5,  3,  2,
+		 1,  3,  8,
+		 2,  0,  9,
+		 7,  0,  1,
+		 9,  6, 11,
+		10,  6,  7,
+		11,  4,  5,
+		 8,  4, 10
+		 */
 	};
 
+	shape = SubDivideMesh(shape, subdivide);
 
+
+	using namespace Math;
 	for (auto &vtx : shape.vertices)
 	{
-		float theta = 0.5f + std::atan2f(vtx.position.y, vtx.position.x) / Math::XM_2PI;
-		float phi = 0.5f - std::asinf(vtx.position.z) / Math::XM_PI;
+		/*
+		float theta = 1.0f - std::atan2f(vtx.position.x, vtx.position.z) / XM_2PI;
+		float phi = std::acosf(vtx.position.y) / XM_PI;
 
 		vtx.texCoord = { theta, phi };
-	}
+		*/
 
+		XMVECTOR n = Math::XMVector3Normalize(XMLoadFloat3(&vtx.position));
+		XMVECTOR p = radius * n;
+
+		XMStoreFloat3(&vtx.position, p);
+	}
 
 
 	return shape;

@@ -46,7 +46,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 															aspectRatio, 
 															0.1f, 
 															1000.0f);
-		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, 0.0f, -1.0f, 0.0f} },
+		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, 1.0f, 1.0f, 0.0f} },
 												  { {0.0f, 0.0f, 0.0f, 0.0f} },
 												  { { 0.0f, 1.0f, 0.0f, 0.0f } });
 		auto projection = viewFrom * prespective;
@@ -100,7 +100,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	//auto shape = Learnings::Octahedron(1.0f);
 	//auto shape = Learnings::Cylinder(0.5f, 0.5f, 1.0f, 10, true);
 	//auto shape = Learnings::Sphere(0.5f, 120, 120);
-	auto shape = Learnings::Icosahedron(1.0f, 1);
+	auto shape = Learnings::Icosahedron(1.0f, 0);
 	uint32_t shapeIdx = 0;
 	rndr->AddGeometry(shapeIdx, shape);
 
@@ -132,13 +132,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		static float i = 0.0f;
 		if (i > 360.0f) i = 0.0f;
 		float a = DirectX::XMConvertToRadians(i);
-		ms = DirectX::XMMatrixRotationZ(a);
+		DirectX::XMFLOAT3 ra{ 0.0f, 1.0f, 0.0f };
+		ms = DirectX::XMMatrixRotationAxis(DirectX::XMLoadFloat3(&ra), a);
 		transform = { DirectX::XMMatrixTranspose(ms) };
 		rndr->SetTransforms(shapeIdx, 0, transform);
 
 		rndr->Draw();
 
-		i += 0.005f;
+		i += 0.01f;
 	}
 
 	CoUninitialize();
