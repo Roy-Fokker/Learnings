@@ -39,7 +39,7 @@ static Mesh SubDivideMesh(Mesh mesh, uint16_t level)
 			},
 			{
 				0.5f * (v0.texCoord.x + v1.texCoord.x),
-				0.5f * (v0.position.y + v1.texCoord.y)
+				0.5f * (v0.texCoord.y + v1.texCoord.y)
 			}
 		};
 
@@ -51,7 +51,7 @@ static Mesh SubDivideMesh(Mesh mesh, uint16_t level)
 			},
 			{
 				0.5f * (v1.texCoord.x + v2.texCoord.x),
-				0.5f * (v1.position.y + v2.texCoord.y)
+				0.5f * (v1.texCoord.y + v2.texCoord.y)
 			}
 		};
 
@@ -63,7 +63,7 @@ static Mesh SubDivideMesh(Mesh mesh, uint16_t level)
 			},
 			{
 				0.5f * (v0.texCoord.x + v2.texCoord.x),
-				0.5f * (v0.position.y + v2.texCoord.y)
+				0.5f * (v0.texCoord.y + v2.texCoord.y)
 			}
 		};
 
