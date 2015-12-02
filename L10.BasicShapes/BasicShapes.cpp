@@ -356,7 +356,92 @@ Mesh Learnings::Icosahedron(float radius, uint16_t subdivide)
 
 Mesh Learnings::Dodecahedron(float radius, uint16_t subdivide)
 {
-	return Mesh();
+	Mesh shape;
+
+	float phi = 0, theta = 0;
+	float dphi = Math::XM_PI / 4;
+	float dtheta = Math::XM_2PI / 5;
+
+	auto points = [&](int n) {
+		for (int i = 0; i < n; i++)
+		{
+			float x, y, z;
+			float u, v;
+
+			x = radius * cos(theta) * sin(phi);
+			z = radius * sin(theta) * sin(phi);
+			y = radius * cos(phi);
+
+			u = 0.0f; // theta / Math::XM_2PI;
+			v = 0.0f; // phi / Math::XM_PI;
+			
+			theta += dtheta;
+
+			shape.vertices.push_back({
+				{ x, y, z },{ u, v }
+			});
+
+		}
+	};
+
+	// 1st Ring
+	phi = dphi / 2.0f;
+	theta = 0;
+	points(5);
+
+	// 2nd Ring
+	phi += dphi;
+	theta = 0;
+	points(5);
+
+	
+	// 3rd Ring
+	phi += dphi;
+	theta = dtheta / 2.0f;
+	points(5);
+
+	// 4th Ring
+	phi += dphi;
+	theta = dtheta / 2.0f;
+	points(5);
+
+	// Indices 
+	shape.indices = {
+		1, 0, 2, // North Cap Pentagon
+		2, 0, 3, // North Cap Pentagon
+		3, 0, 4, // North Cap Pentagon
+
+		6, 0, 1,	 6, 5, 0,	 6, 10, 5, // Ring 1 Pentagons
+		7, 1, 2,	 7, 6, 1,	 7, 11, 6, // Ring 1 Pentagons
+		8, 2, 3,	 8, 7, 2,	 8, 12, 7, // Ring 1 Pentagons
+		9, 3, 4,	 9, 8, 3,	 9, 13, 8, // Ring 1 Pentagons
+		5, 4, 0,	 5, 9, 4,	 5, 14, 9, // Ring 1 Pentagons
+
+		16, 10, 11,	 16, 15, 10,	10, 6, 11, // Ring 2 Pentagons
+		17, 11, 12,	 17, 16, 11,	11, 7, 12, // Ring 2 Pentagons
+		18, 12, 13,	 18, 17, 12,	12, 8, 13, // Ring 2 Pentagons
+		19, 13, 14,	 19, 18, 13,	13, 9, 14, // Ring 2 Pentagons
+		15, 14, 10,	 15, 19, 14,	14, 5, 10, // Ring 2 Pentagons
+
+		17, 15, 16, // North Cap Pentagon
+		18, 15, 17, // North Cap Pentagon
+		19, 15, 18, // North Cap Pentagon
+	};
+
+	/*
+	shape = SubDivideMesh(shape, subdivide);
+
+	using namespace Math;
+	for (auto &vtx : shape.vertices)
+	{
+		XMVECTOR n = Math::XMVector3Normalize(XMLoadFloat3(&vtx.position));
+		XMVECTOR p = radius * n;
+
+		XMStoreFloat3(&vtx.position, p);
+	}
+	*/
+
+	return shape;
 }
 
 Mesh Learnings::Sphere(float radius, uint16_t slices, uint16_t stacks)

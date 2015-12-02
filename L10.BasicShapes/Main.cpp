@@ -46,7 +46,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 															aspectRatio, 
 															0.1f, 
 															1000.0f);
-		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, 1.0f, 1.0f, 0.0f} },
+		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, -1.0f, 1.0f, 0.0f} },
 												  { {0.0f, 0.0f, 0.0f, 0.0f} },
 												  { { 0.0f, 1.0f, 0.0f, 0.0f } });
 		auto projection = viewFrom * prespective;
@@ -132,7 +132,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		static float i = 0.0f;
 		if (i > 360.0f) i = 0.0f;
 		float a = DirectX::XMConvertToRadians(i);
-		DirectX::XMFLOAT3 ra{ -1.0f, 1.0f, 1.0f };
+		DirectX::XMFLOAT3 ra{ 0.0f, 1.0f, 0.0f };
 		ms = DirectX::XMMatrixRotationAxis(DirectX::XMLoadFloat3(&ra), a);
 		transform = { DirectX::XMMatrixTranspose(ms) };
 		rndr->SetTransforms(shapeIdx, 0, transform);
