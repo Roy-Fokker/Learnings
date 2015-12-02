@@ -71,7 +71,7 @@ static Mesh SubDivideMesh(Mesh mesh, uint16_t level)
 			v0, v1, v2, m0, m1, m2
 		});
 
-		uint32_t n = i * 6u;
+		uint32_t n = static_cast<uint32_t>(i) * 6u;
 		subdMesh.indices.insert(subdMesh.indices.end(), {
 			n + 0, n + 3, n + 5,
 			n + 3, n + 4, n + 5,
@@ -273,125 +273,77 @@ Mesh Learnings::Octahedron(float radius)
 Mesh Learnings::Icosahedron(float radius, uint16_t subdivide)
 {
 	Mesh shape;
+	
+	float phi = 0, theta = 0;
+	float dphi = Math::XM_PI / 3;
+	float dtheta = Math::XM_2PI / 5;
 
-	float sqrt5 = std::sqrtf(5.0f);
-	float tau = (1.0f + sqrt5) / 2.0f;
+	auto points = [&](int n) {
+		for (int i = 0; i < n; i++)
+		{
+			float x, y, z;
+			float u, v;
 
-	float a = 1.0f;
-	float b = a * tau;
+			x = radius * cos(theta) * sin(phi);
+			z = radius * sin(theta) * sin(phi);
+			y = radius * cos(phi);
 
-	float du = 5.5f; // number of points horizontally
-	float dv = 3.0f; // number of points vertically
-	/*
-	float edgeRadius = std::sqrtf(10.0f + (2.0f * sqrt5)) / (4.0f * tau);
-	float a = (1.0f / edgeRadius) / 2.0f;
-	float b = (1.0f / edgeRadius) / (2.0f * tau);
-	*/
-	shape.vertices = {
-		{ {-a,  b, 0}, {0.5f / du, 0.0f} }, // 0
-		{ { a,  b, 0}, {2.0f / du, 1.0f / dv} }, // 1
-		{ {-a, -b, 0}, {4.5f / du, 2.0f / dv} }, // 2
-		{ { a, -b, 0}, {1.0f / du, 1.0f} }, // 3
+			u = theta / Math::XM_2PI;
+			v = phi / Math::XM_PI;
 
-		{ {0, -a,  b}, {0.5f / du, 2.0f / dv} }, // 4
-		{ {0,  a,  b}, {1.0f / du, 1.0f / dv} }, // 5
-		{ {0, -a, -b}, {3.5f / du, 2.0f / dv} }, // 6
-		{ {0,  a, -b}, {3.0f / du, 1.0f / dv } }, // 7
 
-		{ { b, 0, -a}, {2.5f / du, 2.0f / dv} }, // 8
-		{ { b, 0,  a}, {1.5f / du, 2.0f / dv} }, // 9
-		{ {-b, 0, -a}, {4.0f / du, 1.0f / dv } }, // 10
-		{ {-b, 0,  a}, {0.0f, 1.0f / dv} }, // 11
-		
+			theta += dtheta;
+			shape.vertices.push_back({
+				{ x, y, z },{ u, v }
+			});
 
-		// duplicates
-		{ { -a,  b,  0 }, { 1.5f / du, 0.0f } }, // 12 - 0 vertex
-		{ { -a,  b,  0 }, { 2.5f / du, 0.0f } }, // 13 - 0 vertex
-		{ { -a,  b,  0 }, { 3.5f / du, 0.0f } }, // 14 - 0 vertex
-		{ { -a,  b,  0 }, { 4.5f / du, 0.0f } }, // 15 - 0 vertex
-		{ { -b,  0,  a }, { 5.0f / du, 1.0f / dv } }, // 16 -  11 vertex
-		{ {  0, -a,  b }, { 1.0f, 2.0f / dv } }, // 17 - 4 vertex
-		{ {  a, -b,  0 }, { 2.0f / du, 1.0f } }, // 18 - 3 vertex
-		{ {  a, -b,  0 }, { 3.0f / du, 1.0f } }, // 19 - 3 vertex
-		{ {  a, -b,  0 }, { 4.0f / du, 1.0f } }, // 20 - 3 vertex
-		{ {  a, -b,  0 }, { 5.0f / du, 1.0f } }, // 21 - 3 vertex
-		/*
-		{ {  0,  b, -a }, { 0.0f, 0.0f } },
-		{ {  b,  a,  0 }, { 0.0f, 0.0f } },
-		{ { -b,  a,  0 }, { 0.0f, 0.0f } },
-		{ {  0,  b,  a }, { 0.0f, 0.0f } },
-		{ {  0, -b,  a }, { 0.0f, 0.0f } },
-		{ { -a,  0,  b }, { 0.0f, 0.0f } },
-		{ {  0, -b, -a }, { 0.0f, 0.0f } },
-		{ {  a,  0, -b }, { 0.0f, 0.0f } },
-		{ {  a,  0,  b }, { 0.0f, 0.0f } },
-		{ { -a,  0, -b }, { 0.0f, 0.0f } },
-		{ {  b, -a,  0 }, { 0.0f, 0.0f } },
-		{ { -b, -a,  0 }, { 0.0f, 0.0f } },
-		*/
+		}
 	};
 
-	shape.indices = {
-		 0, 11,  5,
-		12,  5,  1,  // 0 5 1
-		13,  1,  7,  // 0 1 7
-		14,  7, 10,  // 0 7 10
-		15, 10, 16,  // 0 10 11
+	// Pole
+	phi = 0;
+	theta = dtheta / 2.0f;
+	points(5);
 
-		 1,  5, 9,
-		 5, 11, 4, 
-		16, 10, 2, // 11 10 2
-		10,  7, 6,
-		 7,  1, 8,
+	// 1st Ring
+	phi = dphi;
+	theta = 0;
+	points(6);
+	
+	// 2st Ring
+	phi += dphi;
+	theta = dtheta / 2.0f;
+	points(6);
+	
+	// Pole
+	phi += dphi;
+	theta = dtheta;
+	points(5);
 
-		3,  9, 4, // 3, 9, 4,
-		21, 17, 2, // 3, 4, 2,
-		20,  2, 6, // 3, 2, 6,
-		19,  6, 8, // 3, 6, 8,
-		18,  8, 9, // 3, 8, 9,
+	// Indices 
+	for (int i = 5; i < 10; i++)
+	{
+		uint32_t n1, n2, n3, n4, n5, n6;
+		n1 = i;
+		n2 = i - 5;
+		n3 = i + 1;
+		n4 = i + 6;
+		n5 = n4 + 1;
+		n6 = n4 + 6;
 
-		4, 9, 5, 
-		2, 4, 16, // 2 4 11
-		6, 2, 10,
-		8, 6, 7,
-		9, 8, 1
-		 /*
-		 1,  0,  2,
-		 2,  3,  1,
-		 4,  3,  5,
-		 8,  3,  4,
-		 6,  0,  7,
-		 9,  0,  6, 
-		10,  4, 11,
-		11,  6, 10,
-		 5,  2,  9,
-		 9, 11,  5, 
-		 7,  1,  8,
-		 8, 10,  7,
-		 5,  3,  2,
-		 1,  3,  8,
-		 2,  0,  9,
-		 7,  0,  1,
-		 9,  6, 11,
-		10,  6,  7,
-		11,  4,  5,
-		 8,  4, 10
-		 */
-	};
+		shape.indices.insert(shape.indices.end(), {
+			n1, n2, n3,
+			n1, n3, n4,
+			n4, n3, n5,
+			n4, n5, n6
+		});
+	}
 
 	shape = SubDivideMesh(shape, subdivide);
-
 
 	using namespace Math;
 	for (auto &vtx : shape.vertices)
 	{
-		/*
-		float theta = 1.0f - std::atan2f(vtx.position.x, vtx.position.z) / XM_2PI;
-		float phi = std::acosf(vtx.position.y) / XM_PI;
-
-		vtx.texCoord = { theta, phi };
-		*/
-
 		XMVECTOR n = Math::XMVector3Normalize(XMLoadFloat3(&vtx.position));
 		XMVECTOR p = radius * n;
 
@@ -481,7 +433,7 @@ Mesh Learnings::Sphere(float radius, uint16_t slices, uint16_t stacks)
 	}
 
 	// Faces for South Pole
-	uint32_t spIdx = shape.vertices.size() - 1;
+	uint32_t spIdx = static_cast<uint32_t>(shape.vertices.size() - 1);
 	uint32_t spOffset = spIdx - slices - 1;
 	for (uint32_t i = 1; i <= slices; i++)
 	{
@@ -532,7 +484,7 @@ Mesh Learnings::Cylinder(float radiusTop, float radiusBottom, float height, uint
 		}
 		
 
-		cnt = shape.vertices.size();
+		cnt = static_cast<uint32_t>(shape.vertices.size());
 		
 		// Bottom
 		for (uint16_t i = 0; i < slices; i++)
@@ -558,7 +510,7 @@ Mesh Learnings::Cylinder(float radiusTop, float radiusBottom, float height, uint
 			});
 		}
 
-		cnt = shape.vertices.size();
+		cnt = static_cast<uint32_t>(shape.vertices.size());
 	}
 
 	// Body

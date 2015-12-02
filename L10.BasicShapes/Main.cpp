@@ -100,7 +100,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	//auto shape = Learnings::Octahedron(1.0f);
 	//auto shape = Learnings::Cylinder(0.5f, 0.5f, 1.0f, 10, true);
 	//auto shape = Learnings::Sphere(0.5f, 120, 120);
-	auto shape = Learnings::Icosahedron(1.0f, 0);
+	auto shape = Learnings::Icosahedron(1.0f, 2);
 	uint32_t shapeIdx = 0;
 	rndr->AddGeometry(shapeIdx, shape);
 
@@ -132,7 +132,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		static float i = 0.0f;
 		if (i > 360.0f) i = 0.0f;
 		float a = DirectX::XMConvertToRadians(i);
-		DirectX::XMFLOAT3 ra{ 0.0f, 1.0f, 0.0f };
+		DirectX::XMFLOAT3 ra{ -1.0f, 1.0f, 1.0f };
 		ms = DirectX::XMMatrixRotationAxis(DirectX::XMLoadFloat3(&ra), a);
 		transform = { DirectX::XMMatrixTranspose(ms) };
 		rndr->SetTransforms(shapeIdx, 0, transform);
