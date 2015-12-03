@@ -46,7 +46,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 															aspectRatio, 
 															0.1f, 
 															1000.0f);
-		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, -1.0f, 1.0f, 0.0f} },
+		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, 1.0f, 1.0f, 0.0f} },
 												  { {0.0f, 0.0f, 0.0f, 0.0f} },
 												  { { 0.0f, 1.0f, 0.0f, 0.0f } });
 		auto projection = viewFrom * prespective;
@@ -100,7 +100,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	//auto shape = Learnings::Octahedron(1.0f);
 	//auto shape = Learnings::Cylinder(0.5f, 0.5f, 1.0f, 10, true);
 	//auto shape = Learnings::Sphere(0.5f, 120, 120);
-	auto shape = Learnings::Icosahedron(1.0f, 2);
+	//auto shape = Learnings::Icosahedron(1.0f, 2);
+	auto shape = Learnings::Dodecahedron(1.0f, 4);
 	uint32_t shapeIdx = 0;
 	rndr->AddGeometry(shapeIdx, shape);
 

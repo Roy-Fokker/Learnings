@@ -359,7 +359,8 @@ Mesh Learnings::Dodecahedron(float radius, uint16_t subdivide)
 	Mesh shape;
 
 	float phi = 0, theta = 0;
-	float dphi = Math::XM_PI / 4;
+	float dphi_a = Math::XMConvertToRadians(52.62263590f);  // Where do these numbers come from?
+	float dphi_b = Math::XMConvertToRadians(10.81231754f);  // Where do these numbers come from?
 	float dtheta = Math::XM_2PI / 5;
 
 	auto points = [&](int n) {
@@ -368,13 +369,16 @@ Mesh Learnings::Dodecahedron(float radius, uint16_t subdivide)
 			float x, y, z;
 			float u, v;
 
-			x = radius * cos(theta) * sin(phi);
-			z = radius * sin(theta) * sin(phi);
-			y = radius * cos(phi);
+			x = radius * cos(theta) * cos(phi);
+			z = radius * sin(theta) * cos(phi);
+			y = radius * sin(phi);
 
-			u = 0.0f; // theta / Math::XM_2PI;
-			v = 0.0f; // phi / Math::XM_PI;
-			
+			u = atan2(x, z) / (-Math::XM_2PI);
+			if (u < 0.0f) {
+				u += 1.0f;
+			}
+			v = asin(y) / Math::XM_PI + 0.5f;
+
 			theta += dtheta;
 
 			shape.vertices.push_back({
@@ -385,25 +389,24 @@ Mesh Learnings::Dodecahedron(float radius, uint16_t subdivide)
 	};
 
 	// 1st Ring
-	phi = dphi / 2.0f;
+	phi = dphi_a;
 	theta = 0;
-	points(5);
+	points(6);
 
 	// 2nd Ring
-	phi += dphi;
+	phi = dphi_b;
 	theta = 0;
-	points(5);
+	points(6);
 
-	
 	// 3rd Ring
-	phi += dphi;
+	phi = -dphi_b;
 	theta = dtheta / 2.0f;
-	points(5);
+	points(6);
 
 	// 4th Ring
-	phi += dphi;
+	phi = -dphi_a;
 	theta = dtheta / 2.0f;
-	points(5);
+	points(6);
 
 	// Indices 
 	shape.indices = {
@@ -411,24 +414,24 @@ Mesh Learnings::Dodecahedron(float radius, uint16_t subdivide)
 		2, 0, 3, // North Cap Pentagon
 		3, 0, 4, // North Cap Pentagon
 
-		6, 0, 1,	 6, 5, 0,	 6, 10, 5, // Ring 1 Pentagons
-		7, 1, 2,	 7, 6, 1,	 7, 11, 6, // Ring 1 Pentagons
-		8, 2, 3,	 8, 7, 2,	 8, 12, 7, // Ring 1 Pentagons
-		9, 3, 4,	 9, 8, 3,	 9, 13, 8, // Ring 1 Pentagons
-		5, 4, 0,	 5, 9, 4,	 5, 14, 9, // Ring 1 Pentagons
-
-		16, 10, 11,	 16, 15, 10,	10, 6, 11, // Ring 2 Pentagons
-		17, 11, 12,	 17, 16, 11,	11, 7, 12, // Ring 2 Pentagons
-		18, 12, 13,	 18, 17, 12,	12, 8, 13, // Ring 2 Pentagons
-		19, 13, 14,	 19, 18, 13,	13, 9, 14, // Ring 2 Pentagons
-		15, 14, 10,	 15, 19, 14,	14, 5, 10, // Ring 2 Pentagons
-
-		17, 15, 16, // North Cap Pentagon
-		18, 15, 17, // North Cap Pentagon
-		19, 15, 18, // North Cap Pentagon
+		7, 0, 1,	 7, 6, 0,	 7, 12, 6, // Ring 1 Pentagons
+		8, 1, 2,	 8, 7, 1,	 8, 13, 7, // Ring 1 Pentagons
+		9, 2, 3,	 9, 8, 2,	 9, 14, 8, // Ring 1 Pentagons
+		10, 3, 4,	 10, 9, 3,	 10, 15, 9, // Ring 1 Pentagons
+		11, 4, 5,	 11, 10, 4,	 11, 16, 10, // Ring 1 Pentagons
+		
+		12, 7, 13,	12, 13, 18,	 18, 13, 19, // Ring 2 Pentagons
+		13, 8, 14,	13, 14, 19,	 19, 14, 20, // Ring 2 Pentagons
+		14, 9, 15,	14, 15, 20,	 20, 15, 21, // Ring 2 Pentagons
+		15, 10, 16,	15, 16, 21,	 21, 16, 22, // Ring 2 Pentagons
+		16, 11, 17,	16, 17, 22,	 22, 17, 23, // Ring 2 Pentagons
+		
+		18, 19, 20, // South Cap Pentagon
+		18, 20, 21, // South Cap Pentagon
+		18, 21, 22, // South Cap Pentagon
 	};
 
-	/*
+	
 	shape = SubDivideMesh(shape, subdivide);
 
 	using namespace Math;
@@ -439,7 +442,7 @@ Mesh Learnings::Dodecahedron(float radius, uint16_t subdivide)
 
 		XMStoreFloat3(&vtx.position, p);
 	}
-	*/
+	
 
 	return shape;
 }
