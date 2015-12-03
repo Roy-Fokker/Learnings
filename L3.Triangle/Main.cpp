@@ -17,7 +17,7 @@ std::vector<byte> ReadBinaryFile(const std::wstring &fileName)
 
 	if (!inFile.is_open())
 	{
-		std::runtime_error("Cannot open file");
+		throw std::runtime_error("Cannot open file");
 	}
 
 	buffer.assign((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());

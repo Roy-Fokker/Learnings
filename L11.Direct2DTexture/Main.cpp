@@ -8,6 +8,7 @@
 #include "Window.h"
 #include "Renderer.h"
 #include "Mesh.h"
+#include "BasicShapes.h"
 
 std::vector<byte> ReadBinaryFile(const std::wstring &fileName)
 {
@@ -23,29 +24,6 @@ std::vector<byte> ReadBinaryFile(const std::wstring &fileName)
 	buffer.assign((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
 
 	return buffer;
-}
-
-Learnings::Mesh TriangleMesh (float base, float height, float delta)
-{
-	float halfHeight = height / 2.0f;
-	float halfBase = base / 2.0f;
-
-	float x1 = -halfBase, y1 = -halfHeight,
-		x3 = base * delta, y3 = halfHeight,
-		x2 = halfBase, y2 = y1;
-
-	float oset = 0.5f + delta;
-	return {
-		// Vertex List
-		{
-			{ { x1, y1, +0.5f }, { 0.0f, 1.0f } },
-			{ { x3, y3, +0.5f }, { oset, 0.0f } },
-			{ { x2, y2, +0.5f }, { 1.0f, 1.0f } },
-		},
-
-		// Index List
-		{ 0, 1, 2 }
-	};
 }
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
@@ -68,7 +46,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 															aspectRatio, 
 															0.1f, 
 															1000.0f);
-		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, 0.0f, -1.0f, 0.0f} },
+		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, 1.0f, 1.0f, 0.0f} },
 												  { {0.0f, 0.0f, 0.0f, 0.0f} },
 												  { { 0.0f, 1.0f, 0.0f, 0.0f } });
 		auto projection = viewFrom * prespective;
@@ -112,24 +90,34 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	};
 
 
-	wnd = std::make_unique<Learnings::Window>(800, 500, L"L8. States", Learnings::Window::Style::Windowed, callback);
+	wnd = std::make_unique<Learnings::Window>(800, 500, L"L11. Direct2D Texture", Learnings::Window::Style::Windowed, callback);
 	rndr = std::make_unique<Learnings::Renderer>(wnd->m_hWnd);
 	
+	//auto shape = Learnings::Triangle(1.0f, 1.0f, 0.0f);
+	//auto shape = Learnings::Rectangle(1.0f, 1.0f);
+	//auto shape = Learnings::Box(1.0f, 1.0f, 1.0f);
+	//auto shape = Learnings::Tetrahedron(1.0f);
+	//auto shape = Learnings::Octahedron(1.0f);
+	//auto shape = Learnings::Cylinder(0.5f, 0.5f, 1.0f, 10, true);
+	//auto shape = Learnings::Sphere(0.5f, 120, 120);
+	auto shape = Learnings::Icosahedron(1.0f, 4);
+	//auto shape = Learnings::Dodecahedron(1.0f, 4);
+	uint32_t shapeIdx = 0;
+	rndr->AddGeometry(shapeIdx, shape);
 
-	auto triangle = TriangleMesh(1.0f, 1.0f, 0.0f);
-	rndr->AddGeometry(0, triangle);
+	auto grid = Learnings::Grid(0.5f, 10);
+	uint32_t gridIdx = 1;
+	rndr->AddGeometry(gridIdx, grid);
+	rndr->SetTopology(gridIdx, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	
-	auto ms = DirectX::XMMatrixIdentity();
-	ms = DirectX::XMMatrixRotationAxis({{0.0f, 0.0f, 1.0f}}, 
-									   DirectX::XMConvertToRadians(90.0f));
+	auto ms = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 	Learnings::Transform transform{ DirectX::XMMatrixTranspose(ms) };
-	rndr->SetTransforms(0, 0, transform);
+	//rndr->SetTopology(shapeIdx, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	rndr->SetTransforms(shapeIdx, 0, transform);
 
-	ms = DirectX::XMMatrixIdentity();
-	ms = DirectX::XMMatrixRotationAxis({ { 0.0f, 0.0f, 1.0f } },
-									   DirectX::XMConvertToRadians(-90.0f));
+	ms = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 	transform = { DirectX::XMMatrixTranspose(ms) };
-	rndr->SetTransforms(0, 1, transform);
+	rndr->SetTransforms(gridIdx, 0, transform);
 
 	auto vs = ReadBinaryFile(L"VertexShader.cso");
 	auto ps = ReadBinaryFile(L"PixelShader.cso");
@@ -142,7 +130,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	// Main Loop
 	while (wnd->ProcessMessages())
 	{
+		static float i = 0.0f;
+		if (i > 360.0f) i = 0.0f;
+		float a = DirectX::XMConvertToRadians(i);
+		DirectX::XMFLOAT3 ra{ 0.0f, 1.0f, 0.0f };
+		ms = DirectX::XMMatrixRotationAxis(DirectX::XMLoadFloat3(&ra), a);
+		transform = { DirectX::XMMatrixTranspose(ms) };
+		rndr->SetTransforms(shapeIdx, 0, transform);
+
 		rndr->Draw();
+
+		i += 0.01f;
 	}
 
 	CoUninitialize();
