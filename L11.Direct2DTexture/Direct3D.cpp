@@ -215,6 +215,27 @@ Direct3d::ShaderResourceView Direct3d::CreateShaderResourceView(uint32_t size, c
 	return view;
 }
 
+Direct3d::ShaderResourceView Direct3d::CreateShaderResourceView(Texture2d texture)
+{
+	HRESULT hr;
+
+	/*
+	D3D11_TEXTURE2D_DESC td{};
+	texture->GetDesc(&td);
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC vd{};
+	vd.Format = td.Format;
+	vd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	*/
+
+
+	ShaderResourceView view;
+	hr = m_Device->CreateShaderResourceView(texture, nullptr, &view);
+	ThrowIfFailed(hr, "Cannot create shader resource view");
+
+	return view;
+}
+
 Direct3d::BlendState Direct3d::CreateBlendState(D3D11_BLEND src, D3D11_BLEND srcAlpha, D3D11_BLEND dst, D3D11_BLEND dstAlpha, D3D11_BLEND_OP op, D3D11_BLEND_OP opAlpha)
 {
 	D3D11_BLEND_DESC bd{ 0 };
@@ -302,9 +323,33 @@ Direct3d::SamplerState Direct3d::CreateSamplerState(D3D11_FILTER filter, D3D11_T
 	return state;
 }
 
+Direct3d::Texture2d Direct3d::CreateTexture2d(uint32_t width, uint32_t height, uint32_t bindFlags, D3D11_USAGE usage, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, uint16_t arraysize, uint16_t miplevels)
+{
+	D3D11_TEXTURE2D_DESC td{ };
+
+	td.Width = width;
+	td.Height = height;
+
+	td.BindFlags = bindFlags;
+	td.Usage = usage;
+	td.Format = format;
+	td.SampleDesc = sampleDesc;
+
+	td.ArraySize = arraysize;
+	td.MipLevels = miplevels;
+
+	Texture2d texture;
+	HRESULT hr = m_Device->CreateTexture2D(&td, nullptr, &texture);
+	ThrowIfFailed(hr, "Failed to create texture");
+
+	return texture;
+}
+
 void Direct3d::CreateDevice()
 {
 	uint32_t flags = NULL;
+	flags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+
 #ifdef _DEBUG
 	flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
@@ -416,7 +461,7 @@ void Direct3d::CreateRenderTargetView()
 {
 	HRESULT hr;
 
-	CComPtr<ID3D11Texture2D> buffer = nullptr;
+	Texture2d buffer = nullptr;
 	hr = m_SwapChain->GetBuffer(0, 
 								__uuidof(ID3D11Texture2D), 
 								reinterpret_cast<void **>(&buffer.p));

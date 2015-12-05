@@ -46,7 +46,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 															aspectRatio, 
 															0.1f, 
 															1000.0f);
-		auto viewFrom = DirectX::XMMatrixLookAtLH({ {1.0f, 1.0f, 1.0f, 0.0f} },
+		auto viewFrom = DirectX::XMMatrixLookAtLH({ {0.0f, 0.0f, -1.0f, 0.0f} },
 												  { {0.0f, 0.0f, 0.0f, 0.0f} },
 												  { { 0.0f, 1.0f, 0.0f, 0.0f } });
 		auto projection = viewFrom * prespective;
@@ -94,13 +94,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	rndr = std::make_unique<Learnings::Renderer>(wnd->m_hWnd);
 	
 	//auto shape = Learnings::Triangle(1.0f, 1.0f, 0.0f);
-	//auto shape = Learnings::Rectangle(1.0f, 1.0f);
+	auto shape = Learnings::Rectangle(1.0f, 1.0f);
 	//auto shape = Learnings::Box(1.0f, 1.0f, 1.0f);
 	//auto shape = Learnings::Tetrahedron(1.0f);
 	//auto shape = Learnings::Octahedron(1.0f);
 	//auto shape = Learnings::Cylinder(0.5f, 0.5f, 1.0f, 10, true);
-	//auto shape = Learnings::Sphere(0.5f, 120, 120);
-	auto shape = Learnings::Icosahedron(1.0f, 4);
+	//auto shape = Learnings::Sphere(1.0f, 120, 120);
+	//auto shape = Learnings::Icosahedron(1.0f, 4);
 	//auto shape = Learnings::Dodecahedron(1.0f, 4);
 	uint32_t shapeIdx = 0;
 	rndr->AddGeometry(shapeIdx, shape);
@@ -123,20 +123,21 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	auto ps = ReadBinaryFile(L"PixelShader.cso");
 	rndr->AddShader(vs, ps);
 
-	auto texture = ReadBinaryFile(L"uv_grid.dds");
-	rndr->AddTexture(texture);
+	//auto texture = ReadBinaryFile(L"uv_grid.dds");
+	//rndr->AddTexture(texture);
+	rndr->AddText(L"Hello World");
 
 	wnd->Show(nCmdShow);
 	// Main Loop
+	DirectX::XMFLOAT3 ra{ 0.0f, 1.0f, 0.0f };
 	while (wnd->ProcessMessages())
 	{
 		static float i = 0.0f;
 		if (i > 360.0f) i = 0.0f;
 		float a = DirectX::XMConvertToRadians(i);
-		DirectX::XMFLOAT3 ra{ 0.0f, 1.0f, 0.0f };
 		ms = DirectX::XMMatrixRotationAxis(DirectX::XMLoadFloat3(&ra), a);
 		transform = { DirectX::XMMatrixTranspose(ms) };
-		rndr->SetTransforms(shapeIdx, 0, transform);
+		//rndr->SetTransforms(shapeIdx, 0, transform);
 
 		rndr->Draw();
 

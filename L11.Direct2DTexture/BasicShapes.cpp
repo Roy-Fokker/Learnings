@@ -114,10 +114,10 @@ Mesh Learnings::Rectangle(float length, float width)
 	return{
 		// Vertex List
 		{
-			{ { -l, -w, 0.0f },{ 0.0f, 0.0f } },
-			{ { +l, -w, 0.0f },{ 1.0f, 0.0f } },
-			{ { +l, +w, 0.0f },{ 1.0f, 1.0f } },
-			{ { -l, +w, 0.0f },{ 0.0f, 1.0f } },
+			{ { -l, +w, 0.0f },{ 0.0f, 0.0f } },
+			{ { +l, +w, 0.0f },{ 1.0f, 0.0f } },
+			{ { +l, -w, 0.0f },{ 1.0f, 1.0f } },
+			{ { -l, -w, 0.0f },{ 0.0f, 1.0f } },
 		},
 
 		// Index List

@@ -7,6 +7,93 @@
 
 using namespace Learnings;
 
+/* Direct2D test */
+#include <d2d1.h>
+#include <dwrite.h>
+
+#pragma comment(lib, "d2d1.lib")
+#pragma comment(lib, "dwrite.lib")
+
+#define ThrowIfFailed(hr, msg) \
+if ( FAILED(hr) ) \
+{ \
+  throw std::runtime_error(msg); \
+}
+
+void Renderer::AddText(const std::wstring & text)
+{
+	HRESULT hr;
+
+	// Direct 2D
+	CComPtr<ID2D1Factory> d2dFactory;
+	D2D1_FACTORY_OPTIONS opts{};
+	opts.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
+
+	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, opts, &d2dFactory);
+	ThrowIfFailed(hr, "Failed to create Direct2D Factory");
+
+	// Direct Write
+	CComPtr<IDWriteFactory> writeFactory;
+	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED,
+							 __uuidof(writeFactory),
+							 reinterpret_cast<IUnknown * *>(&writeFactory));
+	ThrowIfFailed(hr, "Failed to create DirectWrite Factory");
+
+	// Texture to write to
+	auto texture = m_d3d->CreateTexture2d(512,
+										  512,
+										  D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE,
+										  D3D11_USAGE_DEFAULT,
+										  DXGI_FORMAT_R8G8B8A8_UNORM,
+										  {1, 0}, 
+										  1, 1);
+	// Convert to ShaderResource
+	m_ShaderResourceView = m_d3d->CreateShaderResourceView(texture);
+
+	// Convert to DXGISurface for Direct2d to consume
+	CComPtr<IDXGISurface1> dxgiSurface;
+	texture->QueryInterface<IDXGISurface1>(&dxgiSurface);
+
+	// Get the desktop dpi
+	float dpiX, dpiY;
+	d2dFactory->GetDesktopDpi(&dpiX, &dpiY);
+
+	// Convert the texture to Direct2D Render Target
+	CComPtr<ID2D1RenderTarget> renderTarget;
+	D2D1_RENDER_TARGET_PROPERTIES rtp = D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT,
+																	 D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED),
+																	 dpiX, dpiY);
+	hr = d2dFactory->CreateDxgiSurfaceRenderTarget(dxgiSurface,
+												   &rtp,
+												   &renderTarget);
+	ThrowIfFailed(hr, "Failed to create Direct2d Surface Render Target");
+
+	// Create brush to write with
+	CComPtr<ID2D1SolidColorBrush> brush;
+	hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Aqua), &brush);
+	ThrowIfFailed(hr, "Failed to create a solid brush");
+
+	// Create DirectWrite text format
+	CComPtr<IDWriteTextFormat> textFormat;
+	hr = writeFactory->CreateTextFormat(L"Consolas", 
+										nullptr, 
+										DWRITE_FONT_WEIGHT_NORMAL, 
+										DWRITE_FONT_STYLE_NORMAL, 
+										DWRITE_FONT_STRETCH_NORMAL, 
+										50.0f,
+										L"", 
+										&textFormat);
+	ThrowIfFailed(hr, "Failed to create DirectWrite text format");
+
+	renderTarget->BeginDraw();
+	renderTarget->Clear(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.0f));
+
+	renderTarget->DrawText(text.c_str(), (uint32_t)text.length(), textFormat, D2D1::RectF(8, 8, 504, 504), brush);
+
+	renderTarget->EndDraw();
+
+}
+
 Renderer::Renderer(HWND hWnd)
 {
 	m_d3d = std::make_unique<Learnings::Direct3d>(hWnd);

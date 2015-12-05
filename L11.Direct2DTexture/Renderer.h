@@ -35,6 +35,8 @@ namespace Learnings
 		void SetTopology(uint32_t meshId, D3D11_PRIMITIVE_TOPOLOGY topology);
 		void SetProjection(const Projection &projection);
 
+		void AddText(const std::wstring &text);
+
 	private:
 		void CreateStates();
 		void DeleteStates();

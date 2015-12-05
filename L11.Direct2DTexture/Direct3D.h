@@ -15,7 +15,7 @@ namespace Learnings
 		typedef CComPtr<ID3D11DeviceContext> Context;
 		typedef CComPtr<ID3D11RenderTargetView> RenderTargetView;
 		typedef CComPtr<ID3D11DepthStencilView> DepthStencilView;
-		typedef CComPtr<ID3D11Texture2D> DepthStencilBuffer;
+		typedef CComPtr<ID3D11Texture2D> Texture2d;
 
 		typedef CComPtr<ID3D11Buffer> Buffer;
 		typedef CComPtr<ID3D11VertexShader> VertexShader;
@@ -50,10 +50,12 @@ namespace Learnings
 		InputLayout CreateInputLayout(uint32_t elemCount, const D3D11_INPUT_ELEMENT_DESC *elemDesc, uint32_t vsSize, const void *vs);
 		bool CheckInputLayout(uint32_t elemCount, const D3D11_INPUT_ELEMENT_DESC *elemDesc, uint32_t vsSize, const void *vs);
 		ShaderResourceView CreateShaderResourceView(uint32_t size, const uint8_t *tex);
+		ShaderResourceView CreateShaderResourceView(Texture2d texture);
 		BlendState CreateBlendState(D3D11_BLEND src, D3D11_BLEND srcAlpha, D3D11_BLEND dst, D3D11_BLEND dstAlpha, D3D11_BLEND_OP op, D3D11_BLEND_OP opAlpha);
 		DepthStencilState CreateDepthStencilState(bool depthEnable, bool writeEnable);
 		RasterizerState CreateRasterizerState(D3D11_CULL_MODE cullMode, D3D11_FILL_MODE fillMode);
 		SamplerState CreateSamplerState(D3D11_FILTER filter, D3D11_TEXTURE_ADDRESS_MODE textureAddressMode, uint32_t maxAnisotropy);
+		Texture2d CreateTexture2d(uint32_t width, uint32_t height, uint32_t bindFlags, D3D11_USAGE usage, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, uint16_t arraysize, uint16_t miplevels);
 
 	private:
 		void CreateDevice();
@@ -80,7 +82,7 @@ namespace Learnings
 		Context m_Context;
 
 		RenderTargetView m_RenderTargetView;
-		DepthStencilBuffer m_DepthStencilBuffer;
+		Texture2d m_DepthStencilBuffer;
 		DepthStencilView m_DepthStencilView;
 
 		BOOL m_vSync = FALSE;
