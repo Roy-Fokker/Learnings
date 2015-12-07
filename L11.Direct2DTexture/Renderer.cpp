@@ -61,7 +61,7 @@ void Renderer::AddText(const std::wstring & text)
 	// Convert the texture to Direct2D Render Target
 	CComPtr<ID2D1RenderTarget> renderTarget;
 	D2D1_RENDER_TARGET_PROPERTIES rtp = D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT,
-																	 D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED),
+																	 D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
 																	 dpiX, dpiY);
 	hr = d2dFactory->CreateDxgiSurfaceRenderTarget(dxgiSurface,
 												   &rtp,
@@ -80,13 +80,13 @@ void Renderer::AddText(const std::wstring & text)
 										DWRITE_FONT_WEIGHT_NORMAL, 
 										DWRITE_FONT_STYLE_NORMAL, 
 										DWRITE_FONT_STRETCH_NORMAL, 
-										50.0f,
+										100.0f,
 										L"", 
 										&textFormat);
 	ThrowIfFailed(hr, "Failed to create DirectWrite text format");
 
 	renderTarget->BeginDraw();
-	renderTarget->Clear(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.0f));
+	renderTarget->Clear(D2D1::ColorF(0, 0.0f));
 
 	renderTarget->DrawText(text.c_str(), (uint32_t)text.length(), textFormat, D2D1::RectF(8, 8, 504, 504), brush);
 
@@ -320,8 +320,8 @@ void Renderer::CreateStates()
 {
 	m_BlendState = m_d3d->CreateBlendState(D3D11_BLEND_ONE, 
 										   D3D11_BLEND_ONE, 
-										   D3D11_BLEND_ZERO, 
-										   D3D11_BLEND_ZERO, 
+										   D3D11_BLEND_SRC_ALPHA,
+										   D3D11_BLEND_SRC_ALPHA,
 										   D3D11_BLEND_OP_ADD, 
 										   D3D11_BLEND_OP_ADD);
 
