@@ -133,6 +133,11 @@ Direct3d::Context Direct3d::GetContext() const
 	return m_Context;
 }
 
+Direct3d::Device Direct3d::GetDevice() const
+{
+	return m_Device;
+}
+
 Direct3d::Buffer Direct3d::CreateBuffer(uint32_t size, const void *data, D3D11_BIND_FLAG bindFlags, D3D11_USAGE usage, UINT accessFlags)
 {
 	D3D11_BUFFER_DESC bd{ 0 };

@@ -125,7 +125,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	//auto texture = ReadBinaryFile(L"uv_grid.dds");
 	//rndr->AddTexture(texture);
-	rndr->AddText(L"Hello World");
+	rndr->AddText(L"Hello_World");
 
 	wnd->Show(nCmdShow);
 	// Main Loop

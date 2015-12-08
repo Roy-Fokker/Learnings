@@ -8,7 +8,7 @@
 using namespace Learnings;
 
 /* Direct2D test */
-#include <d2d1.h>
+#include <d2d1_1.h>
 #include <dwrite.h>
 
 #pragma comment(lib, "d2d1.lib")
@@ -17,27 +17,12 @@ using namespace Learnings;
 #define ThrowIfFailed(hr, msg) \
 if ( FAILED(hr) ) \
 { \
-  throw std::runtime_error(msg); \
+	throw std::runtime_error(msg); \
 }
 
 void Renderer::AddText(const std::wstring & text)
 {
 	HRESULT hr;
-
-	// Direct 2D
-	CComPtr<ID2D1Factory> d2dFactory;
-	D2D1_FACTORY_OPTIONS opts{};
-	opts.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
-
-	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, opts, &d2dFactory);
-	ThrowIfFailed(hr, "Failed to create Direct2D Factory");
-
-	// Direct Write
-	CComPtr<IDWriteFactory> writeFactory;
-	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED,
-							 __uuidof(writeFactory),
-							 reinterpret_cast<IUnknown * *>(&writeFactory));
-	ThrowIfFailed(hr, "Failed to create DirectWrite Factory");
 
 	// Texture to write to
 	auto texture = m_d3d->CreateTexture2d(512,
@@ -45,33 +30,54 @@ void Renderer::AddText(const std::wstring & text)
 										  D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE,
 										  D3D11_USAGE_DEFAULT,
 										  DXGI_FORMAT_R8G8B8A8_UNORM,
-										  {1, 0}, 
+										  { 1, 0 },
 										  1, 1);
-	// Convert to ShaderResource
+	// Convert to ShaderResource for Direct3d use
 	m_ShaderResourceView = m_d3d->CreateShaderResourceView(texture);
 
 	// Convert to DXGISurface for Direct2d to consume
 	CComPtr<IDXGISurface1> dxgiSurface;
 	texture->QueryInterface<IDXGISurface1>(&dxgiSurface);
 
-	// Get the desktop dpi
-	float dpiX, dpiY;
-	d2dFactory->GetDesktopDpi(&dpiX, &dpiY);
 
-	// Convert the texture to Direct2D Render Target
-	CComPtr<ID2D1RenderTarget> renderTarget;
-	D2D1_RENDER_TARGET_PROPERTIES rtp = D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT,
-																	 D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
-																	 dpiX, dpiY);
-	hr = d2dFactory->CreateDxgiSurfaceRenderTarget(dxgiSurface,
-												   &rtp,
-												   &renderTarget);
-	ThrowIfFailed(hr, "Failed to create Direct2d Surface Render Target");
+	// Get DXGI device from D3D device
+	CComPtr<IDXGIDevice> dxgiDevice;
+	hr = m_d3d->GetDevice()->QueryInterface<IDXGIDevice>(&dxgiDevice);
+	ThrowIfFailed(hr, "Failed to get DXGI Device from D3D11Device");
+
+	// Get Direct 2D Device from DXGI
+	CComPtr<ID2D1Device> d2dDevice;
+	hr = D2D1CreateDevice(dxgiDevice, nullptr, &d2dDevice);
+	ThrowIfFailed(hr, "Failed to create Direct2D device");
+
+	// Create Direct 2D Device Context
+	D2D1_DEVICE_CONTEXT_OPTIONS opts = D2D1_DEVICE_CONTEXT_OPTIONS_NONE;
+	CComPtr<ID2D1DeviceContext> d2dContext;
+	hr = d2dDevice->CreateDeviceContext(opts, &d2dContext);
+	ThrowIfFailed(hr, "Failed to create Direct2D device context");
+
+	// Convert the texture to Direct2d surface
+	D2D1_BITMAP_PROPERTIES1 props{};
+	props.pixelFormat.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	props.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
+	props.bitmapOptions = D2D1_BITMAP_OPTIONS_TARGET;
+	CComPtr<ID2D1Bitmap1> d2dBitmap;
+	d2dContext->CreateBitmapFromDxgiSurface(dxgiSurface, props, &d2dBitmap);
+
+	// Set Direct2d Bitmap as target
+	d2dContext->SetTarget(d2dBitmap);
 
 	// Create brush to write with
 	CComPtr<ID2D1SolidColorBrush> brush;
-	hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Aqua), &brush);
+	hr = d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Aqua), &brush);
 	ThrowIfFailed(hr, "Failed to create a solid brush");
+
+	// Direct Write
+	CComPtr<IDWriteFactory> writeFactory;
+	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED,
+							 __uuidof(writeFactory),
+							 reinterpret_cast<IUnknown * *>(&writeFactory));
+	ThrowIfFailed(hr, "Failed to create DirectWrite Factory");
 
 	// Create DirectWrite text format
 	CComPtr<IDWriteTextFormat> textFormat;
@@ -85,12 +91,23 @@ void Renderer::AddText(const std::wstring & text)
 										&textFormat);
 	ThrowIfFailed(hr, "Failed to create DirectWrite text format");
 
-	renderTarget->BeginDraw();
-	renderTarget->Clear(D2D1::ColorF(0, 0.0f));
+	// Create DirectWrite text layout
+	CComPtr<IDWriteTextLayout> textLayout;
+	hr = writeFactory->CreateTextLayout(text.c_str(),
+										(uint32_t)text.length(),
+										textFormat,
+										512, 512,
+										&textLayout);
+	ThrowIfFailed(hr, "Failed to create DirectWrite text layout");
 
-	renderTarget->DrawText(text.c_str(), (uint32_t)text.length(), textFormat, D2D1::RectF(8, 8, 504, 504), brush);
+	d2dContext->BeginDraw();
+	d2dContext->Clear(D2D1::ColorF(0, 0.0f));
+		
+	d2dContext->DrawTextLayout({ 0, 0 },
+								 textLayout,
+								 brush);
 
-	renderTarget->EndDraw();
+	d2dContext->EndDraw();
 
 }
 

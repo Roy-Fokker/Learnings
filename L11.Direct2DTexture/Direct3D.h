@@ -43,6 +43,7 @@ namespace Learnings
 		void Resize();
 	
 		Context GetContext() const;
+		Device GetDevice() const;
 
 		Buffer CreateBuffer(uint32_t size, const void *data, D3D11_BIND_FLAG bindFlags, D3D11_USAGE usage, UINT accessFlags);
 		VertexShader CreateVertexShader(uint32_t size, const void *vs);
