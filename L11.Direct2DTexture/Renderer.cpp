@@ -43,9 +43,10 @@ void Renderer::AddText(const std::wstring & text)
 	Direct2d::Context context = d2d.GetContext();
 
 	// Convert the texture to Direct2d surface
-	// Convert to DXGISurface for Direct2d to consume
 	Direct2d::Surface dxgiSurface;
 	texture->QueryInterface<IDXGISurface1>(&dxgiSurface);
+
+	// Convert to DXGISurface for Direct2d to consume
 	Direct2d::Bitmap bitmap = d2d.CreateBitmap(dxgiSurface);
 
 	// Set Direct2d Bitmap as target
@@ -85,9 +86,12 @@ void Renderer::AddText(const std::wstring & text)
 	context->BeginDraw();
 	context->Clear(D2D1::ColorF(0, 0.0f));
 		
-	context->DrawTextLayout({ 0, 0 },
-								 textLayout,
-								 brush);
+	context->DrawTextLayout({ 10, 10 },
+							textLayout,
+							brush);
+
+	auto rect = D2D1::RectF(10.0f, 256.0f, 502.f, 502.f);
+	context->FillRectangle(rect, brush);
 
 	context->EndDraw();
 
