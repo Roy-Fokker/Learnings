@@ -5,15 +5,11 @@
 #include "Renderer.h"
 #include "Mesh.h"
 
+#include "Direct2D.h"
+
 using namespace Learnings;
 
 /* Direct2D test */
-#include <d2d1_1.h>
-#include <dwrite.h>
-
-#pragma comment(lib, "d2d1.lib")
-#pragma comment(lib, "dwrite.lib")
-
 #define ThrowIfFailed(hr, msg) \
 if ( FAILED(hr) ) \
 { \
@@ -35,42 +31,28 @@ void Renderer::AddText(const std::wstring & text)
 	// Convert to ShaderResource for Direct3d use
 	m_ShaderResourceView = m_d3d->CreateShaderResourceView(texture);
 
-	// Convert to DXGISurface for Direct2d to consume
-	CComPtr<IDXGISurface1> dxgiSurface;
-	texture->QueryInterface<IDXGISurface1>(&dxgiSurface);
-
-
 	// Get DXGI device from D3D device
-	CComPtr<IDXGIDevice> dxgiDevice;
+	Direct2d::DxgiDevice dxgiDevice;
 	hr = m_d3d->GetDevice()->QueryInterface<IDXGIDevice>(&dxgiDevice);
 	ThrowIfFailed(hr, "Failed to get DXGI Device from D3D11Device");
 
 	// Get Direct 2D Device from DXGI
-	CComPtr<ID2D1Device> d2dDevice;
-	hr = D2D1CreateDevice(dxgiDevice, nullptr, &d2dDevice);
-	ThrowIfFailed(hr, "Failed to create Direct2D device");
+	Direct2d d2d(dxgiDevice);
 
 	// Create Direct 2D Device Context
-	D2D1_DEVICE_CONTEXT_OPTIONS opts = D2D1_DEVICE_CONTEXT_OPTIONS_NONE;
-	CComPtr<ID2D1DeviceContext> d2dContext;
-	hr = d2dDevice->CreateDeviceContext(opts, &d2dContext);
-	ThrowIfFailed(hr, "Failed to create Direct2D device context");
+	Direct2d::Context context = d2d.GetContext();
 
 	// Convert the texture to Direct2d surface
-	D2D1_BITMAP_PROPERTIES1 props{};
-	props.pixelFormat.format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	props.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
-	props.bitmapOptions = D2D1_BITMAP_OPTIONS_TARGET;
-	CComPtr<ID2D1Bitmap1> d2dBitmap;
-	d2dContext->CreateBitmapFromDxgiSurface(dxgiSurface, props, &d2dBitmap);
+	// Convert to DXGISurface for Direct2d to consume
+	Direct2d::Surface dxgiSurface;
+	texture->QueryInterface<IDXGISurface1>(&dxgiSurface);
+	Direct2d::Bitmap bitmap = d2d.CreateBitmap(dxgiSurface);
 
 	// Set Direct2d Bitmap as target
-	d2dContext->SetTarget(d2dBitmap);
+	context->SetTarget(bitmap);
 
 	// Create brush to write with
-	CComPtr<ID2D1SolidColorBrush> brush;
-	hr = d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Aqua), &brush);
-	ThrowIfFailed(hr, "Failed to create a solid brush");
+	Direct2d::SolidColorBrush brush = d2d.CreateSolidBrush(D2D1::ColorF(D2D1::ColorF::Aqua));
 
 	// Direct Write
 	CComPtr<IDWriteFactory> writeFactory;
@@ -100,14 +82,14 @@ void Renderer::AddText(const std::wstring & text)
 										&textLayout);
 	ThrowIfFailed(hr, "Failed to create DirectWrite text layout");
 
-	d2dContext->BeginDraw();
-	d2dContext->Clear(D2D1::ColorF(0, 0.0f));
+	context->BeginDraw();
+	context->Clear(D2D1::ColorF(0, 0.0f));
 		
-	d2dContext->DrawTextLayout({ 0, 0 },
+	context->DrawTextLayout({ 0, 0 },
 								 textLayout,
 								 brush);
 
-	d2dContext->EndDraw();
+	context->EndDraw();
 
 }
 

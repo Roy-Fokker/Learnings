@@ -13,6 +13,7 @@ namespace Learnings
 	{
 	public:
 		typedef CComPtr<ID3D11DeviceContext> Context;
+
 		typedef CComPtr<ID3D11RenderTargetView> RenderTargetView;
 		typedef CComPtr<ID3D11DepthStencilView> DepthStencilView;
 		typedef CComPtr<ID3D11Texture2D> Texture2d;
@@ -90,4 +91,4 @@ namespace Learnings
 
 		HWND m_hWnd;
 	};
-}
+};
