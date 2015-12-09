@@ -96,9 +96,9 @@ Mesh Learnings::Triangle(float base, float height, float tipOffset)
 	return{
 		// Vertex List
 		{
-			{ { x1, y1, 0.0f },{ 0.0f, 1.0f } },
-			{ { x2, y2, 0.0f },{ 1.0f, 1.0f } },
 			{ { x3, y3, 0.0f },{ oset, 0.0f } },
+			{ { x2, y2, 0.0f },{ 1.0f, 1.0f } },
+			{ { x1, y1, 0.0f },{ 0.0f, 1.0f } },
 		},
 
 		// Index List
