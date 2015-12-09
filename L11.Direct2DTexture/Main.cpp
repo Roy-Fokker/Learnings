@@ -93,8 +93,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	wnd = std::make_unique<Learnings::Window>(800, 500, L"L11. Direct2D Texture", Learnings::Window::Style::Windowed, callback);
 	rndr = std::make_unique<Learnings::Renderer>(wnd->m_hWnd);
 	
-	auto shape = Learnings::Triangle(1.0f, 1.0f, 0.0f);
-	//auto shape = Learnings::Rectangle(1.0f, 1.0f);
+	//auto shape = Learnings::Triangle(1.0f, 1.0f, 0.0f);
+	auto shape = Learnings::Rectangle(1.0f, 1.0f);
 	//auto shape = Learnings::Box(1.0f, 1.0f, 1.0f);
 	//auto shape = Learnings::Tetrahedron(1.0f);
 	//auto shape = Learnings::Octahedron(1.0f);
