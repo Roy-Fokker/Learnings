@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 #include "Direct3D.h"
+#include "Direct2D.h"
+
 
 namespace Learnings
 {
@@ -43,6 +45,7 @@ namespace Learnings
 
 	private:
 		std::unique_ptr<Learnings::Direct3d> m_d3d;
+		std::unique_ptr<Learnings::Direct2d> m_d2d;
 
 		std::vector<RenderableMesh> m_Meshes;
 		std::map<uint32_t, uint32_t> m_MeshIds;

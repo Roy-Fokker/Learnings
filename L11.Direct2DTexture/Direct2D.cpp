@@ -53,6 +53,35 @@ Direct2d::SolidColorBrush Direct2d::CreateSolidBrush(D2D1::ColorF color)
 	return brush;
 }
 
+Direct2d::TextFormat Direct2d::CreateTextFormat(const std::wstring &font, float size)
+{
+	TextFormat textFormat;
+	HRESULT hr = m_WriteFactory->CreateTextFormat(font.c_str(),
+												  nullptr,
+												  DWRITE_FONT_WEIGHT_NORMAL,
+												  DWRITE_FONT_STYLE_NORMAL,
+												  DWRITE_FONT_STRETCH_NORMAL,
+												  size,
+												  L"",
+												  &textFormat);
+	ThrowIfFailed(hr, "Failed to create DirectWrite text format");
+
+	return textFormat;
+}
+
+Direct2d::TextLayout Direct2d::CreateTextLayout(const std::wstring &text, float width, float height, TextFormat format)
+{
+	TextLayout textLayout;
+	HRESULT hr = m_WriteFactory->CreateTextLayout(text.c_str(),
+												  (uint32_t)text.length(),
+												  format,
+												  width, height,
+												  &textLayout);
+	ThrowIfFailed(hr, "Failed to create DirectWrite text layout");
+
+	return textLayout;
+}
+
 Direct2d::Context Direct2d::GetContext() const
 {
 	return m_Context;
@@ -67,10 +96,16 @@ void Direct2d::CreateDevice(DxgiDevice device)
 	D2D1_DEVICE_CONTEXT_OPTIONS opts = D2D1_DEVICE_CONTEXT_OPTIONS_NONE;
 	hr = m_Device->CreateDeviceContext(opts, &m_Context);
 	ThrowIfFailed(hr, "Failed to create Direct2D device context");
+
+	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED,
+							 __uuidof(m_WriteFactory),
+							 reinterpret_cast<IUnknown**>(&m_WriteFactory));
+	ThrowIfFailed(hr, "Failed to create DirectWrite Factory");
 }
 
 void Direct2d::DeleteDevice()
 {
+	m_WriteFactory.Release();
 	m_Context.Release();
 	m_Device.Release();
 }

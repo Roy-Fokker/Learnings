@@ -5,8 +5,6 @@
 #include "Renderer.h"
 #include "Mesh.h"
 
-#include "Direct2D.h"
-
 using namespace Learnings;
 
 /* Direct2D test */
@@ -18,8 +16,6 @@ if ( FAILED(hr) ) \
 
 void Renderer::AddText(const std::wstring & text)
 {
-	HRESULT hr;
-
 	// Texture to write to
 	auto texture = m_d3d->CreateTexture2d(512,
 										  512,
@@ -31,57 +27,28 @@ void Renderer::AddText(const std::wstring & text)
 	// Convert to ShaderResource for Direct3d use
 	m_ShaderResourceView = m_d3d->CreateShaderResourceView(texture);
 
-	// Get DXGI device from D3D device
-	Direct2d::DxgiDevice dxgiDevice;
-	hr = m_d3d->GetDevice()->QueryInterface<IDXGIDevice>(&dxgiDevice);
-	ThrowIfFailed(hr, "Failed to get DXGI Device from D3D11Device");
-
-	// Get Direct 2D Device from DXGI
-	Direct2d d2d(dxgiDevice);
-
 	// Create Direct 2D Device Context
-	Direct2d::Context context = d2d.GetContext();
+	Direct2d::Context context = m_d2d->GetContext();
 
 	// Convert the texture to Direct2d surface
 	Direct2d::Surface dxgiSurface;
 	texture->QueryInterface<IDXGISurface1>(&dxgiSurface);
 
 	// Convert to DXGISurface for Direct2d to consume
-	Direct2d::Bitmap bitmap = d2d.CreateBitmap(dxgiSurface);
+	Direct2d::Bitmap bitmap = m_d2d->CreateBitmap(dxgiSurface);
 
 	// Set Direct2d Bitmap as target
 	context->SetTarget(bitmap);
 
 	// Create brush to write with
-	Direct2d::SolidColorBrush brush = d2d.CreateSolidBrush(D2D1::ColorF(D2D1::ColorF::Aqua));
-
-	// Direct Write
-	CComPtr<IDWriteFactory> writeFactory;
-	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED,
-							 __uuidof(writeFactory),
-							 reinterpret_cast<IUnknown * *>(&writeFactory));
-	ThrowIfFailed(hr, "Failed to create DirectWrite Factory");
+	Direct2d::SolidColorBrush brush = m_d2d->CreateSolidBrush(D2D1::ColorF(D2D1::ColorF::Aqua));
 
 	// Create DirectWrite text format
-	CComPtr<IDWriteTextFormat> textFormat;
-	hr = writeFactory->CreateTextFormat(L"Consolas", 
-										nullptr, 
-										DWRITE_FONT_WEIGHT_NORMAL, 
-										DWRITE_FONT_STYLE_NORMAL, 
-										DWRITE_FONT_STRETCH_NORMAL, 
-										100.0f,
-										L"", 
-										&textFormat);
-	ThrowIfFailed(hr, "Failed to create DirectWrite text format");
+	Direct2d::TextFormat format = m_d2d->CreateTextFormat(L"Consolas", 100.0f);
 
 	// Create DirectWrite text layout
-	CComPtr<IDWriteTextLayout> textLayout;
-	hr = writeFactory->CreateTextLayout(text.c_str(),
-										(uint32_t)text.length(),
-										textFormat,
-										512, 512,
-										&textLayout);
-	ThrowIfFailed(hr, "Failed to create DirectWrite text layout");
+	Direct2d::TextLayout textLayout = m_d2d->CreateTextLayout(text, 512.0f, 256.0f, format);
+	//textLayout->SetStrikethrough(TRUE, {6, 5});
 
 	context->BeginDraw();
 	context->Clear(D2D1::ColorF(0, 0.0f));
@@ -102,6 +69,12 @@ Renderer::Renderer(HWND hWnd)
 	m_d3d = std::make_unique<Learnings::Direct3d>(hWnd);
 
 	CreateStates();
+
+	// Get DXGI device from D3D device
+	Direct2d::DxgiDevice dxgiDevice;
+	HRESULT hr = m_d3d->GetDevice()->QueryInterface<IDXGIDevice>(&dxgiDevice);
+	ThrowIfFailed(hr, "Failed to get DXGI Device from D3D11Device");
+	m_d2d = std::make_unique<Learnings::Direct2d>(dxgiDevice);
 }
 
 Renderer::~Renderer()
