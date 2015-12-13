@@ -25,6 +25,7 @@ using namespace Learnings;
 namespace
 {
 	static const DXGI_FORMAT C_SwapChainFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	static const UINT C_MSAA_SampleCount = 2U;
 	
 	inline void GetWindowSize(HWND hWnd, uint16_t &width, uint16_t &height)
 	{
@@ -39,12 +40,15 @@ namespace
 	{
 		DXGI_SAMPLE_DESC sd{ 1, 0 };
 
+#ifdef DEBUG
+		return sd;
+#else
 		UINT msaa = 0;
-		UINT sampleCount = 4U;
+		UINT sampleCount = C_MSAA_SampleCount;
 		HRESULT hr = device->CheckMultisampleQualityLevels(C_SwapChainFormat, sampleCount, &msaa);
 		if (SUCCEEDED(hr))
 		{
-			if (msaa - 1 > 0)
+			if (msaa > 0)
 			{
 				sd.Count = sampleCount;
 				sd.Quality = msaa - 1;
@@ -52,6 +56,7 @@ namespace
 		}
 
 		return sd;
+#endif
 	}
 
 	inline DXGI_RATIONAL QueryRefreshRate(CComPtr<IDXGIAdapter> dxgiAdapter, uint16_t width, uint16_t height, BOOL vSync)
