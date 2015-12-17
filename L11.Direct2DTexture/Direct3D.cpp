@@ -25,7 +25,7 @@ using namespace Learnings;
 namespace
 {
 	static const DXGI_FORMAT C_SwapChainFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-	static const UINT C_MSAA_SampleCount = 2U;
+	static const UINT C_MSAA_SampleCount = 16U;
 	
 	inline void GetWindowSize(HWND hWnd, uint16_t &width, uint16_t &height)
 	{
@@ -228,16 +228,6 @@ Direct3d::ShaderResourceView Direct3d::CreateShaderResourceView(uint32_t size, c
 Direct3d::ShaderResourceView Direct3d::CreateShaderResourceView(Texture2d texture)
 {
 	HRESULT hr;
-
-	/*
-	D3D11_TEXTURE2D_DESC td{};
-	texture->GetDesc(&td);
-
-	D3D11_SHADER_RESOURCE_VIEW_DESC vd{};
-	vd.Format = td.Format;
-	vd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	*/
-
 
 	ShaderResourceView view;
 	hr = m_Device->CreateShaderResourceView(texture, nullptr, &view);

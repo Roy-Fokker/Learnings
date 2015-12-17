@@ -42,6 +42,7 @@ void Renderer::AddText(const std::wstring & text)
 
 	// Create brush to write with
 	Direct2d::SolidColorBrush brush = m_d2d->CreateSolidBrush(D2D1::ColorF(D2D1::ColorF::Aqua));
+	Direct2d::SolidColorBrush blackBrush = m_d2d->CreateSolidBrush(D2D1::ColorF(D2D1::ColorF::Black));
 
 	// Create DirectWrite text format
 	Direct2d::TextFormat format = m_d2d->CreateTextFormat(L"Consolas", 100.0f);
@@ -51,8 +52,20 @@ void Renderer::AddText(const std::wstring & text)
 	//textLayout->SetStrikethrough(TRUE, {6, 5});
 
 	context->BeginDraw();
-	context->Clear(D2D1::ColorF(0, 0.0f));
-		
+	context->Clear(D2D1::ColorF(D2D1::ColorF::Beige));
+	
+	context->DrawTextLayout({ 8, 8 },
+							textLayout,
+							blackBrush);
+	context->DrawTextLayout({ 8, 12 },
+							textLayout,
+							blackBrush);
+	context->DrawTextLayout({ 12, 8 },
+							textLayout,
+							blackBrush);
+	context->DrawTextLayout({ 12, 12 },
+							textLayout,
+							blackBrush);
 	context->DrawTextLayout({ 10, 10 },
 							textLayout,
 							brush);
