@@ -1,5 +1,11 @@
 #include "Window.h"
 
+//#include <dwmapi.h>
+//#pragma comment(lib, "dwmapi.lib")
+//	MARGINS dwmMargins{ -1, -1, -1, -1 };
+//	DwmExtendFrameIntoClientArea(m_hWnd, &dwmMargins);
+
+
 using namespace Learnings;
 
 //-------------------------------------------------------------------------------------
