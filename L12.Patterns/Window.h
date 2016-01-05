@@ -22,7 +22,10 @@ namespace Learnings
 
 		enum class Message
 		{
-			Close
+			Close,
+			Pause,
+			Resume,
+			Resized
 		};
 
 		struct Desc
@@ -44,8 +47,11 @@ namespace Learnings
 		~Window();
 
 		void Show();
-		void Restyle(Style style);
-		void Resize(uint16_t width, uint16_t height);
+
+		void SetSize(uint16_t width, uint16_t height);
+		POINT GetSize() const;
+		void SetStyle(Style style);
+		Style GetStyle() const;
 
 		void Update();
 
@@ -54,17 +60,29 @@ namespace Learnings
 
 		bool m_IsActive;
 		bool m_IsFullscreen;
+		bool m_IsResizing;
+		Style m_CurrentStyle;
 
 #pragma region ATL Window Specific
 	public:
 		BEGIN_MSG_MAP(Window)
 			MESSAGE_HANDLER(WM_CLOSE, OnClose)
 			MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
+			MESSAGE_HANDLER(WM_PAINT, OnPaint)
+			MESSAGE_HANDLER(WM_SYSCOMMAND, OnSystemCommand)
+			MESSAGE_RANGE_HANDLER(WM_ENTERSIZEMOVE, WM_EXITSIZEMOVE, OnSizing)
+			MESSAGE_HANDLER(WM_SIZE, OnResize)
+			MESSAGE_HANDLER(WM_ACTIVATEAPP, OnActivate)
 		END_MSG_MAP()
 
 	private:
 		LRESULT OnClose(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
 		LRESULT OnDestroy(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
+		LRESULT OnPaint(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
+		LRESULT OnSystemCommand(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
+		LRESULT OnSizing(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
+		LRESULT OnResize(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
+		LRESULT OnActivate(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
 #pragma endregion
 
 	};

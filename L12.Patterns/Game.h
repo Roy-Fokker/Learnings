@@ -5,6 +5,7 @@
 #include <cstdint>
 
 #include "Window.h"
+#include "Services.h"
 
 namespace Learnings
 {
@@ -21,6 +22,7 @@ namespace Learnings
 
 	private:
 		std::unique_ptr<Window> m_Window;
+		std::unique_ptr<Services> m_Services;
 
 		bool m_Exit;
 	};
