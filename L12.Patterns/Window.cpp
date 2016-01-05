@@ -1,6 +1,6 @@
-#include "Window.h"
 
-#include "resource.h"
+
+#include "Window.h"
 
 using namespace Learnings;
 
@@ -8,15 +8,19 @@ Window::Window(const Desc &desc, const Callback &callback)
 	: m_Callback(callback), m_IsActive(false), m_IsFullscreen(false)
 {
 	auto hInstance = GetModuleHandle(NULL);
-	auto icon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
-	GetWndClassInfo().m_wc.hIcon = icon;
-
+	
 	Create(nullptr,
 		   RECT{ 0, 0, desc.width, desc.height },
 		   desc.title.c_str(),
 		   WS_POPUP | WS_SIZEBOX,
 		   WS_EX_COMPOSITED
 		   );
+
+	if (desc.iconResId)
+	{
+		auto icon = LoadIcon(hInstance, MAKEINTRESOURCE(desc.iconResId));
+		SetIcon(icon);
+	}
 
 	Restyle(desc.style);
 	Resize(desc.width, desc.height);

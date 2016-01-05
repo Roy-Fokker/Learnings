@@ -1,5 +1,7 @@
 #include <functional>
 
+#include "resource.h"
+
 #include "Game.h"
 
 
@@ -12,7 +14,8 @@ Game::Game(const std::wstring &cmdLine)
 	Window::Desc desc{
 		800, 600,
 		L"L12.Patterns",
-		Window::Style::Windowed
+		Window::Style::Windowed,
+		IDI_ICON1
 	};
 
 	using namespace std::placeholders;

@@ -33,6 +33,8 @@ namespace Learnings
 			std::wstring title;
 
 			Style style;
+
+			int iconResId;
 		};
 
 		typedef std::function<bool(Message, uint16_t, uint16_t)> Callback;
