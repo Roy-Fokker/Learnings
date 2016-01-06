@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdint>
 #include <functional>
+#include <array>
 
 #include <Windows.h>
 #include <atlbase.h>
@@ -49,7 +50,7 @@ namespace Learnings
 		void Show();
 
 		void SetSize(uint16_t width, uint16_t height);
-		POINT GetSize() const;
+		std::array<uint16_t, 2> GetSize() const;
 		void SetStyle(Style style);
 		Style GetStyle() const;
 

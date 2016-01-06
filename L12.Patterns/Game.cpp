@@ -25,7 +25,7 @@ Game::Game(const std::wstring &cmdLine)
 
 	m_Window = std::make_unique<Window>(desc, callback);
 
-	auto d3d = std::make_shared<Direct3D>(m_Window->m_hWnd);
+	auto d3d = std::make_shared<GraphicsDevice>(m_Window->m_hWnd);
 	m_Services->Add(d3d);
 }
 
@@ -37,9 +37,15 @@ int Learnings::Game::Run()
 {
 	m_Window->Show();
 
+	auto gfxDevice = m_Services->Get<GraphicsDevice>();
+
 	while (!m_Exit)
 	{
 		m_Window->Update();
+
+
+
+		gfxDevice->Present(true);
 	}
 
 	return 0;
@@ -64,14 +70,7 @@ bool Game::WindowCallback(Window::Message msg, uint16_t lparam, uint16_t wparam)
 			OutputDebugStringA("Application has resumed\n");
 			break;
 		case WM::Resized:
-			OutputDebugStringA("Application has resized - ");
-			
-			if (m_Window->GetStyle() == Window::Style::Fullscreen)
-				OutputDebugStringA("\tFullscreen Mode\n");
-			else if (m_Window->GetStyle() == Window::Style::Windowed)
-				OutputDebugStringA("\tWindowed Mode\n");
-
-			auto d3d = m_Services->Get<Direct3D>();
+			auto d3d = m_Services->Get<GraphicsDevice>();
 			if (d3d) d3d->Resize(lparam, wparam);
 
 			break;

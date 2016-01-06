@@ -51,14 +51,14 @@ void Window::SetSize(uint16_t width, uint16_t height)
 	}
 }
 
-POINT Window::GetSize() const
+std::array<uint16_t, 2> Window::GetSize() const
 {
 	RECT rect{};
 	GetClientRect(&rect);
 
-	return POINT{
-		(rect.left - rect.right),
-		(rect.bottom - rect.top)
+	return {
+		(uint16_t)(rect.left - rect.right),
+		(uint16_t)(rect.bottom - rect.top)
 	};
 }
 
