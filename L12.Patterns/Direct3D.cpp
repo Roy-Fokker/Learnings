@@ -5,6 +5,8 @@
 	#pragma comment(lib, "dxguid.lib")
 #endif
 
+#define RESTORE_DEFERRED_CONTEXT_STATE FALSE // recommended by MSDN
+
 #include "Utility.h"
 #include "Direct3D.h"
 
@@ -89,6 +91,8 @@ namespace
 	static const uint16_t C_MSAAQualityLevel = 4U;
 }
 
+#pragma region Direct3D Device Wrapper
+
 GraphicsDevice::GraphicsDevice(HWND hWnd)
 	: m_hWnd(hWnd)
 {
@@ -111,6 +115,66 @@ void GraphicsDevice::Present(bool vSync)
 		(vSync ? TRUE : FALSE),
 		NULL
 	);
+}
+
+GraphicsDevice::RenderTargetView GraphicsDevice::CreateRenderTargetView(uint16_t index)
+{
+	HRESULT hr;
+
+	Texture2D buffer = nullptr;
+	hr = m_SwapChain->GetBuffer(index, __uuidof(ID3D11Texture2D), reinterpret_cast<void **>(&buffer.p));
+	ThrowIfFailed(hr, "Failed to get Swap Chain buffer");
+	
+	RenderTargetView rtv;
+	hr = m_Device->CreateRenderTargetView(buffer, 0, &rtv);
+	ThrowIfFailed(hr, "Failed to create RenderTargetView from buffer");
+
+	buffer.Release();
+
+	return rtv;
+}
+
+GraphicsDevice::DepthStencilView GraphicsDevice::CreateDepthStencilView(uint16_t index)
+{
+	HRESULT hr;
+
+	DXGI_SWAP_CHAIN_DESC desc{};
+	hr = m_SwapChain->GetDesc(&desc);
+	ThrowIfFailed(hr, "Failed to get swap chain description");
+
+	Texture2D buffer = CreateTexture(desc.BufferDesc.Width,
+									 desc.BufferDesc.Height,
+									 D3D11_BIND_DEPTH_STENCIL,
+									 D3D11_USAGE_DEFAULT,
+									 DXGI_FORMAT_D24_UNORM_S8_UINT,
+									 desc.SampleDesc,
+									 1,
+									 1);
+
+	DepthStencilView dsv;
+	hr = m_Device->CreateDepthStencilView(buffer, NULL, &dsv);
+	ThrowIfFailed(hr, "Failed to create depth stencil view");
+
+	return dsv;
+}
+
+D3D11_VIEWPORT Learnings::GraphicsDevice::GetViewportDesc()
+{
+	HRESULT hr;
+
+	DXGI_SWAP_CHAIN_DESC desc{};
+	hr = m_SwapChain->GetDesc(&desc);
+	ThrowIfFailed(hr, "Failed to get swap chain description");
+
+	D3D11_VIEWPORT vd{};
+	vd.Width = (float)desc.BufferDesc.Width;
+	vd.Height = (float)desc.BufferDesc.Height;
+	vd.MinDepth = 0.0f;
+	vd.MaxDepth = 1.0f;
+	vd.TopLeftX = 0.0f;
+	vd.TopLeftY = 0.0f;
+
+	return vd;
 }
 
 GraphicsDevice::Texture2D GraphicsDevice::CreateTexture(uint32_t width, uint32_t height, uint32_t bindFlags, D3D11_USAGE usage, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, uint16_t arraysize, uint16_t miplevels)
@@ -366,3 +430,43 @@ void GraphicsDevice::ResizeSwapChain(uint16_t width, uint16_t height)
 	hr = m_SwapChain->ResizeBuffers(0, width, height, C_SwapChainFormat, 0);
 	ThrowIfFailed(hr, "Failed to resize swap chain buffer");
 }
+
+#pragma endregion
+
+#pragma region Render Target Wrapper
+
+RenderTarget::RenderTarget(GraphicsDevice::Context context, GraphicsDevice::RenderTargetView rtv, GraphicsDevice::DepthStencilView dsv, D3D11_VIEWPORT viewport)
+	: m_Context(context),
+	m_RTV(rtv),
+	m_DSV(dsv),
+	m_Viewport(viewport),
+	m_CommandList(nullptr)
+{
+}
+
+RenderTarget::~RenderTarget()
+{
+}
+
+void RenderTarget::Clear(const std::array<float, 4u>& color)
+{
+	m_Context->ClearRenderTargetView(m_RTV, color.data());
+	m_Context->ClearDepthStencilView(m_DSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+}
+
+void RenderTarget::Finish()
+{
+	if (m_Context->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED)
+	{
+		m_CommandList.Release();
+
+		m_Context->FinishCommandList(RESTORE_DEFERRED_CONTEXT_STATE, &(m_CommandList.p));
+	}
+}
+
+GraphicsDevice::CommandList RenderTarget::CommandList() const
+{
+	return m_CommandList;
+}
+
+#pragma endregion

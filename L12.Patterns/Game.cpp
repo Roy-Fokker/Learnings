@@ -27,6 +27,12 @@ Game::Game(const std::wstring &cmdLine)
 
 	auto d3d = std::make_shared<GraphicsDevice>(m_Window->m_hWnd);
 	m_Services->Add(d3d);
+
+	auto rt = std::make_shared<RenderTarget>(d3d->GetImmediateContext(),
+											 d3d->CreateRenderTargetView(0),
+											 d3d->CreateDepthStencilView(0),
+											 d3d->GetViewportDesc());
+	m_Services->Add(rt);
 }
 
 Game::~Game()
@@ -39,11 +45,15 @@ int Learnings::Game::Run()
 
 	auto gfxDevice = m_Services->Get<GraphicsDevice>();
 
+	std::array<float, 4u> color{ 0.75f, 0.5f, 0.25f, 1.0f };
+
 	while (!m_Exit)
 	{
 		m_Window->Update();
 
-
+		// has to be here in case we resize
+		auto rt = m_Services->Get<RenderTarget>();
+		rt->Clear(color);
 
 		gfxDevice->Present(true);
 	}
@@ -70,10 +80,20 @@ bool Game::WindowCallback(Window::Message msg, uint16_t lparam, uint16_t wparam)
 			OutputDebugStringA("Application has resumed\n");
 			break;
 		case WM::Resized:
+		{
+			m_Services->Remove<RenderTarget>();	// Remove old render target
+
 			auto d3d = m_Services->Get<GraphicsDevice>();
-			if (d3d) d3d->Resize(lparam, wparam);
+			d3d->Resize(lparam, wparam); // Resize swap chain
+
+			auto rt = std::make_shared<RenderTarget>(d3d->GetImmediateContext(),
+													 d3d->CreateRenderTargetView(0),
+													 d3d->CreateDepthStencilView(0),
+													 d3d->GetViewportDesc());
+			m_Services->Add(rt);	// Add new render target
 
 			break;
+		}
 	}
 
 	return false;

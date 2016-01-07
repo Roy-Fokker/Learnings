@@ -35,6 +35,8 @@ namespace Learnings
 
 		typedef CComPtr<ID3D11ShaderResourceView> ShaderResourceView;
 
+		typedef CComPtr<ID3D11CommandList> CommandList;
+
 	private:
 		typedef CComPtr<ID3D11Device> Device;
 		typedef CComPtr<IDXGISwapChain> SwapChain;
@@ -46,6 +48,10 @@ namespace Learnings
 		void Resize(uint16_t width, uint16_t height);
 
 		void Present(bool vSync);
+
+		RenderTargetView CreateRenderTargetView(uint16_t index);
+		DepthStencilView CreateDepthStencilView(uint16_t index);
+		D3D11_VIEWPORT GetViewportDesc();
 
 		Texture2D CreateTexture(uint32_t width, uint32_t height, uint32_t bindFlags, D3D11_USAGE usage, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, uint16_t arraysize, uint16_t miplevels);
 		ShaderResourceView CreateShaderResourceView(const Texture2D &texture);
@@ -79,6 +85,27 @@ namespace Learnings
 
 		Device m_Device;
 		SwapChain m_SwapChain;
+	};
+
+	class RenderTarget : public Service
+	{
+	public:
+		RenderTarget(GraphicsDevice::Context context, GraphicsDevice::RenderTargetView rtv, GraphicsDevice::DepthStencilView dsv, D3D11_VIEWPORT viewport);
+		~RenderTarget();
+		
+		void Clear(const std::array<float, 4u> &color);
+
+		void Finish();
+
+		GraphicsDevice::CommandList CommandList() const;
+		
+	private:
+		GraphicsDevice::Context m_Context;
+		GraphicsDevice::RenderTargetView m_RTV;
+		GraphicsDevice::DepthStencilView m_DSV;
+		D3D11_VIEWPORT m_Viewport;
+
+		GraphicsDevice::CommandList m_CommandList;
 	};
 }
 

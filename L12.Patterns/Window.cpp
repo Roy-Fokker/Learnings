@@ -196,11 +196,13 @@ LRESULT Window::OnSizing(UINT msg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 		case WM_ENTERSIZEMOVE:
 			OutputDebugStringA("Enter Size Move\n");
 			m_IsResizing = true;
+			m_IsActive = false;
 			m_Callback(Message::Pause, 0, 0);
 			break;
 		case WM_EXITSIZEMOVE:
 			OutputDebugStringA("Exit Size Move\n");
 			m_IsResizing = false;
+			m_IsActive = true;
 			m_Callback(Message::Resume, 0, 0);
 			break;
 		}

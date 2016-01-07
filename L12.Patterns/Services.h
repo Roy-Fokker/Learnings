@@ -30,6 +30,16 @@ namespace Learnings
 			return nullptr;
 		}
 
+		template <class T>
+		void Remove()
+		{
+			auto type = std::type_index(typeid(T));
+			auto it = m_Services.find(type);
+
+			if (it != m_Services.end())
+				m_Services.erase(it);
+		}
+
 	private:
 		std::map<std::type_index, std::shared_ptr<Service>> m_Services;
 	};
