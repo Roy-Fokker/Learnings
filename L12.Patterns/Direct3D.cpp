@@ -158,7 +158,7 @@ GraphicsDevice::DepthStencilView GraphicsDevice::CreateDepthStencilView(uint16_t
 	return dsv;
 }
 
-D3D11_VIEWPORT Learnings::GraphicsDevice::GetViewportDesc()
+D3D11_VIEWPORT GraphicsDevice::GetViewportDesc()
 {
 	HRESULT hr;
 

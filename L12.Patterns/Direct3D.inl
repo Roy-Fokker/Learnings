@@ -2,6 +2,8 @@
 
 using namespace Learnings;
 
+#pragma region Direct3D Device Wrapper
+
 template<uint16_t SIZE>
 GraphicsDevice::InputLayout GraphicsDevice::CreateInputLayout(const std::array<D3D11_INPUT_ELEMENT_DESC, SIZE>& elements, const std::vector<byte>& vsByteCode)
 {
@@ -30,3 +32,5 @@ bool GraphicsDevice::CheckInputLayout(const std::array<D3D11_INPUT_ELEMENT_DESC,
 
 	return false;
 }
+
+#pragma endregion
