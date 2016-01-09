@@ -6,6 +6,7 @@
 
 #include "Services.h"
 #include "Direct3D.h"
+#include "RenderTarget.h"
 
 using namespace Learnings;
 
@@ -43,19 +44,11 @@ int Learnings::Game::Run()
 {
 	m_Window->Show();
 
-	auto gfxDevice = m_Services->Get<GraphicsDevice>();
-
-	std::array<float, 4u> color{ 0.75f, 0.5f, 0.25f, 1.0f };
-
 	while (!m_Exit)
 	{
-		m_Window->Update();
+		Update();
 
-		// has to be here in case we resize
-		auto rt = m_Services->Get<RenderTarget>();
-		rt->Clear(color);
-
-		gfxDevice->Present(true);
+		Draw();
 	}
 
 	return 0;
@@ -81,20 +74,40 @@ bool Game::WindowCallback(Window::Message msg, uint16_t lparam, uint16_t wparam)
 			break;
 		case WM::Resized:
 		{
-			m_Services->Remove<RenderTarget>();	// Remove old render target
+			auto rt = m_Services->Get<RenderTarget>();
+
+			rt->ReleaseViewBuffers();
 
 			auto d3d = m_Services->Get<GraphicsDevice>();
 			d3d->Resize(lparam, wparam); // Resize swap chain
 
-			auto rt = std::make_shared<RenderTarget>(d3d->GetImmediateContext(),
-													 d3d->CreateRenderTargetView(0),
-													 d3d->CreateDepthStencilView(0),
-													 d3d->GetViewportDesc());
-			m_Services->Add(rt);	// Add new render target
+			rt->UpdateViewBuffers(d3d->CreateRenderTargetView(0),
+								  d3d->CreateDepthStencilView(0),
+								  d3d->GetViewportDesc());
+			
 
 			break;
 		}
 	}
 
 	return false;
+}
+
+void Learnings::Game::Update()
+{
+	m_Window->Update();
+
+}
+
+void Learnings::Game::Draw()
+{
+	std::array<float, 4u> color{ 0.75f, 0.5f, 0.25f, 1.0f };
+
+	auto rt = m_Services->Get<RenderTarget>();
+	rt->Clear(color);
+
+
+
+	auto gfxDevice = m_Services->Get<GraphicsDevice>();
+	gfxDevice->Present(true);
 }

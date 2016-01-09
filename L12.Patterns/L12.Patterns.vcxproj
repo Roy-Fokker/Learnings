@@ -145,6 +145,7 @@
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Main.h" />
+    <ClInclude Include="RenderTarget.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Services.h" />
     <ClInclude Include="Utility.h" />
@@ -154,6 +155,7 @@
     <ClCompile Include="Direct3D.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="Services.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="Window.cpp" />

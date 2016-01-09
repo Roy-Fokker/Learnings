@@ -20,6 +20,10 @@ namespace Learnings
 	private:
 		bool WindowCallback(Window::Message msg, uint16_t lparam, uint16_t wparam);
 
+		// Temporary
+		void Update();
+		void Draw();
+
 	private:
 		std::unique_ptr<Window> m_Window;
 		std::unique_ptr<Services> m_Services;

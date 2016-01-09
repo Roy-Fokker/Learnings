@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <array>
+#include <utility>
 
 #include "Services.h"
 
@@ -85,27 +86,6 @@ namespace Learnings
 
 		Device m_Device;
 		SwapChain m_SwapChain;
-	};
-
-	class RenderTarget : public Service
-	{
-	public:
-		RenderTarget(GraphicsDevice::Context context, GraphicsDevice::RenderTargetView rtv, GraphicsDevice::DepthStencilView dsv, D3D11_VIEWPORT viewport);
-		~RenderTarget();
-		
-		void Clear(const std::array<float, 4u> &color);
-
-		void Finish();
-
-		GraphicsDevice::CommandList CommandList() const;
-		
-	private:
-		GraphicsDevice::Context m_Context;
-		GraphicsDevice::RenderTargetView m_RTV;
-		GraphicsDevice::DepthStencilView m_DSV;
-		D3D11_VIEWPORT m_Viewport;
-
-		GraphicsDevice::CommandList m_CommandList;
 	};
 }
 

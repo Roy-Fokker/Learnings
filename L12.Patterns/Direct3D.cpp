@@ -2,10 +2,9 @@
 #pragma comment(lib, "d3d11.lib")
 
 #if defined(_DEBUG) || defined(DEBUG)
-	#pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "dxguid.lib")
 #endif
 
-#define RESTORE_DEFERRED_CONTEXT_STATE FALSE // recommended by MSDN
 
 #include "Utility.h"
 #include "Direct3D.h"
@@ -62,17 +61,17 @@ namespace
 
 			uint32_t displayModesCnt = 0;
 			hr = adapterOutput->GetDisplayModeList(dxgiFormat,
-				DXGI_ENUM_MODES_INTERLACED,
-				&displayModesCnt,
-				nullptr);
+												   DXGI_ENUM_MODES_INTERLACED,
+												   &displayModesCnt,
+												   nullptr);
 			ThrowIfFailed(hr, "Failed to get display modes count");
 
 
 			std::vector<DXGI_MODE_DESC> displayModes(displayModesCnt);
 			hr = adapterOutput->GetDisplayModeList(dxgiFormat,
-				DXGI_ENUM_MODES_INTERLACED,
-				&displayModesCnt,
-				&displayModes[0]);
+												   DXGI_ENUM_MODES_INTERLACED,
+												   &displayModesCnt,
+												   &displayModes[0]);
 			ThrowIfFailed(hr, "Failed to get display modes list");
 
 			for (auto &mode : displayModes)
@@ -90,8 +89,6 @@ namespace
 	static const DXGI_FORMAT C_SwapChainFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	static const uint16_t C_MSAAQualityLevel = 4U;
 }
-
-#pragma region Direct3D Device Wrapper
 
 GraphicsDevice::GraphicsDevice(HWND hWnd)
 	: m_hWnd(hWnd)
@@ -114,7 +111,7 @@ void GraphicsDevice::Present(bool vSync)
 	m_SwapChain->Present(
 		(vSync ? TRUE : FALSE),
 		NULL
-	);
+		);
 }
 
 GraphicsDevice::RenderTargetView GraphicsDevice::CreateRenderTargetView(uint16_t index)
@@ -124,7 +121,7 @@ GraphicsDevice::RenderTargetView GraphicsDevice::CreateRenderTargetView(uint16_t
 	Texture2D buffer = nullptr;
 	hr = m_SwapChain->GetBuffer(index, __uuidof(ID3D11Texture2D), reinterpret_cast<void **>(&buffer.p));
 	ThrowIfFailed(hr, "Failed to get Swap Chain buffer");
-	
+
 	RenderTargetView rtv;
 	hr = m_Device->CreateRenderTargetView(buffer, 0, &rtv);
 	ThrowIfFailed(hr, "Failed to create RenderTargetView from buffer");
@@ -368,15 +365,15 @@ void GraphicsDevice::CreateDevice()
 	};
 
 	HRESULT hr = D3D11CreateDevice(nullptr,
-		D3D_DRIVER_TYPE_HARDWARE,
-		nullptr,
-		flags,
-		&featureLevels[0],
-		static_cast<uint32_t>(featureLevels.size()),
-		D3D11_SDK_VERSION,
-		&m_Device,
-		nullptr,
-		nullptr); //&m_Context);
+								   D3D_DRIVER_TYPE_HARDWARE,
+								   nullptr,
+								   flags,
+								   &featureLevels[0],
+								   static_cast<uint32_t>(featureLevels.size()),
+								   D3D11_SDK_VERSION,
+								   &m_Device,
+								   nullptr,
+								   nullptr); //&m_Context);
 	ThrowIfFailed(hr, "Failed to create direct3d device and context");
 }
 
@@ -430,43 +427,3 @@ void GraphicsDevice::ResizeSwapChain(uint16_t width, uint16_t height)
 	hr = m_SwapChain->ResizeBuffers(0, width, height, C_SwapChainFormat, 0);
 	ThrowIfFailed(hr, "Failed to resize swap chain buffer");
 }
-
-#pragma endregion
-
-#pragma region Render Target Wrapper
-
-RenderTarget::RenderTarget(GraphicsDevice::Context context, GraphicsDevice::RenderTargetView rtv, GraphicsDevice::DepthStencilView dsv, D3D11_VIEWPORT viewport)
-	: m_Context(context),
-	m_RTV(rtv),
-	m_DSV(dsv),
-	m_Viewport(viewport),
-	m_CommandList(nullptr)
-{
-}
-
-RenderTarget::~RenderTarget()
-{
-}
-
-void RenderTarget::Clear(const std::array<float, 4u>& color)
-{
-	m_Context->ClearRenderTargetView(m_RTV, color.data());
-	m_Context->ClearDepthStencilView(m_DSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-}
-
-void RenderTarget::Finish()
-{
-	if (m_Context->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED)
-	{
-		m_CommandList.Release();
-
-		m_Context->FinishCommandList(RESTORE_DEFERRED_CONTEXT_STATE, &(m_CommandList.p));
-	}
-}
-
-GraphicsDevice::CommandList RenderTarget::CommandList() const
-{
-	return m_CommandList;
-}
-
-#pragma endregion
