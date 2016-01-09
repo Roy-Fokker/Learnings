@@ -2,17 +2,18 @@
 
 #include "resource.h"
 
+#include "Utility.h"
+
 #include "Game.h"
 
-#include "Services.h"
-#include "Direct3D.h"
 #include "RenderTarget.h"
+#include "Vertex.h"
 
 using namespace Learnings;
 
 Game::Game(const std::wstring &cmdLine)
-	: m_Exit (false),
-	m_Services(new Services())
+	: m_Exit (false)/*,
+	m_Services(new Services())*/
 {
 	Window::Desc desc{
 		800, 600,
@@ -26,14 +27,14 @@ Game::Game(const std::wstring &cmdLine)
 
 	m_Window = std::make_unique<Window>(desc, callback);
 
-	auto d3d = std::make_shared<GraphicsDevice>(m_Window->m_hWnd);
-	m_Services->Add(d3d);
+	m_GfxDev = std::make_unique<GraphicsDevice>(m_Window->m_hWnd);
+	
 
-	auto rt = std::make_shared<RenderTarget>(d3d->GetImmediateContext(),
-											 d3d->CreateRenderTargetView(0),
-											 d3d->CreateDepthStencilView(0),
-											 d3d->GetViewportDesc());
-	m_Services->Add(rt);
+	m_RT = std::make_unique<RenderTarget>(m_GfxDev->GetImmediateContext(),
+										  m_GfxDev->CreateRenderTargetView(0),
+										  m_GfxDev->CreateDepthStencilView(0),
+										  m_GfxDev->GetViewportDesc());
+	
 }
 
 Game::~Game()
@@ -42,7 +43,7 @@ Game::~Game()
 
 int Learnings::Game::Run()
 {
-	m_Window->Show();
+	Load();
 
 	while (!m_Exit)
 	{
@@ -74,16 +75,13 @@ bool Game::WindowCallback(Window::Message msg, uint16_t lparam, uint16_t wparam)
 			break;
 		case WM::Resized:
 		{
-			auto rt = m_Services->Get<RenderTarget>();
+			m_RT->ReleaseViewBuffers();
 
-			rt->ReleaseViewBuffers();
+			m_GfxDev->Resize(lparam, wparam); // Resize swap chain
 
-			auto d3d = m_Services->Get<GraphicsDevice>();
-			d3d->Resize(lparam, wparam); // Resize swap chain
-
-			rt->UpdateViewBuffers(d3d->CreateRenderTargetView(0),
-								  d3d->CreateDepthStencilView(0),
-								  d3d->GetViewportDesc());
+			m_RT->UpdateViewBuffers(m_GfxDev->CreateRenderTargetView(0),
+									m_GfxDev->CreateDepthStencilView(0),
+									m_GfxDev->GetViewportDesc());
 			
 
 			break;
@@ -93,21 +91,77 @@ bool Game::WindowCallback(Window::Message msg, uint16_t lparam, uint16_t wparam)
 	return false;
 }
 
-void Learnings::Game::Update()
+void Game::Load()
+{
+	// Vertex Shader and Input layout
+	{
+		auto vsf = ReadBinaryFile(L"VertexShader.cso");
+		vs = m_GfxDev->CreateVertexShader(vsf);
+		il = m_GfxDev->CreateInputLayout(VertexPositionTexture::ElementsDesc, vsf);
+	}
+	// Pixel Shader
+	{
+		auto psf = ReadBinaryFile(L"PixelShader.cso");
+		ps = m_GfxDev->CreatePixelShader(psf);
+	}
+	// Texture/DDS file
+	{
+		auto texf = ReadBinaryFile(L"uv_grid.dds");
+		srv = m_GfxDev->CreateShaderResourceView(texf);
+	}
+	// Rectangle mesh
+	{
+		float x = 0.5f, y = 0.5f;
+		Mesh mesh{
+			{
+				{ { -x, -y, +0.5f },{ 0.0f, 1.0f } },
+				{ { -x, +y, +0.5f },{ 0.0f, 0.0f } },
+				{ { +x, +y, +0.5f },{ 1.0f, 0.0f } },
+				{ { +x, -y, +0.5f },{ 1.0f, 1.0f } },
+			},
+			{
+				0, 1, 2,
+				0, 2, 3
+			}
+		};
+
+		vb = m_GfxDev->CreateBuffer(mesh.vertices.data(),
+									mesh.VertexListSize(),
+									D3D11_BIND_VERTEX_BUFFER,
+									D3D11_USAGE_DEFAULT,
+									NULL);
+		ib = m_GfxDev->CreateBuffer(mesh.indices.data(),
+									mesh.IndexListSize(),
+									D3D11_BIND_INDEX_BUFFER,
+									D3D11_USAGE_DEFAULT,
+									NULL);
+		ic = (uint32_t)mesh.indices.size();
+	}
+
+	m_Window->Show();
+
+	m_RT->SetStates(nullptr, nullptr, nullptr, nullptr);
+}
+
+void Game::Update()
 {
 	m_Window->Update();
 
+	m_RT->SetShader(vs, ps);
+	m_RT->SetInputType(il, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_RT->SetShaderResource({
+		std::make_tuple(RenderTarget::Stage::Pixel, srv, 0)
+	});
+	m_RT->SetMeshData(vb, VertexPositionTexture::Size, ib);
 }
 
-void Learnings::Game::Draw()
+void Game::Draw()
 {
 	std::array<float, 4u> color{ 0.75f, 0.5f, 0.25f, 1.0f };
+	
+	m_RT->Clear(color);
 
-	auto rt = m_Services->Get<RenderTarget>();
-	rt->Clear(color);
+	m_RT->Draw(ic, 0, 0);
 
-
-
-	auto gfxDevice = m_Services->Get<GraphicsDevice>();
-	gfxDevice->Present(true);
+	m_GfxDev->Present(true);
 }

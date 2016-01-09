@@ -5,6 +5,7 @@
 #pragma comment(lib, "dxguid.lib")
 #endif
 
+#include <DDSTextureLoader.cpp>
 
 #include "Utility.h"
 #include "Direct3D.h"
@@ -209,8 +210,14 @@ GraphicsDevice::ShaderResourceView GraphicsDevice::CreateShaderResourceView(cons
 
 GraphicsDevice::ShaderResourceView GraphicsDevice::CreateShaderResourceView(const std::vector<byte>& ddsData)
 {
-	ThrowNotImplmented();
-	return ShaderResourceView();
+	ShaderResourceView srv;
+	HRESULT hr = DirectX::CreateDDSTextureFromMemory(m_Device,
+													 ddsData.data(),
+													 ddsData.size(),
+													 nullptr,
+													 &srv);
+	ThrowIfFailed(hr, "Cannot create shader resource from dds data");
+	return srv;
 }
 
 GraphicsDevice::Buffer GraphicsDevice::CreateBuffer(const void *data, uint32_t size, D3D11_BIND_FLAG bindFlags, D3D11_USAGE usage, UINT accessFlags)

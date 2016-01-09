@@ -5,7 +5,7 @@
 
 namespace Learnings
 {
-	class RenderTarget : public Service
+	class RenderTarget
 	{
 	public:
 		enum class Type
@@ -19,6 +19,9 @@ namespace Learnings
 			Vertex,
 			Pixel
 		};
+
+		typedef std::vector< std::tuple<Stage, GraphicsDevice::Buffer, uint16_t> > ConstantBufferList;
+		typedef std::vector< std::tuple<Stage, GraphicsDevice::ShaderResourceView, uint16_t> > ShaderResourceList;
 
 	public:
 		RenderTarget(GraphicsDevice::Context context, GraphicsDevice::RenderTargetView rtv, GraphicsDevice::DepthStencilView dsv, D3D11_VIEWPORT viewport);
@@ -36,8 +39,8 @@ namespace Learnings
 		void SetInputType(GraphicsDevice::InputLayout il, D3D11_PRIMITIVE_TOPOLOGY tp);
 		void SetShader(GraphicsDevice::VertexShader vs, GraphicsDevice::PixelShader ps);
 		void SetStates(GraphicsDevice::BlendState bs, GraphicsDevice::DepthStencilState ds, GraphicsDevice::RasterizerState rs, GraphicsDevice::SamplerState ss);
-		void SetConstantBuffers(const std::vector< std::tuple<Stage, GraphicsDevice::Buffer, uint16_t> > &buffers);
-		void SetShaderResource(const std::vector< std::tuple<Stage, GraphicsDevice::ShaderResourceView, uint16_t> > &resources);
+		void SetConstantBuffers(const ConstantBufferList &buffers);
+		void SetShaderResource(const ShaderResourceList &resources);
 		void SetMeshData(GraphicsDevice::Buffer vb, uint32_t vertexSize, GraphicsDevice::Buffer ib);
 
 		void Draw(uint32_t indexCount, uint32_t indexStart, uint32_t vertexStart);

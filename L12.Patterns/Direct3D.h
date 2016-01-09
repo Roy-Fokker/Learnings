@@ -15,7 +15,7 @@
 
 namespace Learnings
 {
-	class GraphicsDevice : public Service
+	class GraphicsDevice
 	{
 	public:
 		typedef CComPtr<ID3D11DeviceContext> Context;

@@ -4,11 +4,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_PropertySheetDisplayName>DDSTextureLoader</_PropertySheetDisplayName>
+    <IncludePath>C:\Dev\DirectXTex\DDSTextureLoader;$(IncludePath)</IncludePath>
+    <SourcePath>C:\Dev\DirectXTex\DDSTextureLoader;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
-    <ClCompile>
-      <AdditionalIncludeDirectories>C:\Dev\DirectXTex\DDSTextureLoader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
+    <ClCompile />
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

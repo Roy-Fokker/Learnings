@@ -89,6 +89,9 @@ void RenderTarget::SetStates(GraphicsDevice::BlendState bs, GraphicsDevice::Dept
 	{
 		m_Context->PSSetSamplers(0, 1, &(ss.p));
 	}
+
+	m_Context->OMSetRenderTargets(1, &(m_RTV.p), m_DSV);
+	m_Context->RSSetViewports(1, &m_Viewport);
 }
 
 void RenderTarget::SetConstantBuffers(const std::vector< std::tuple<Stage, GraphicsDevice::Buffer, uint16_t> > &buffers)
