@@ -9,7 +9,7 @@ const std::array<D3D11_INPUT_ELEMENT_DESC, VertexPositionTexture::C_VertexElemen
 } };
 
 const uint32_t VertexPositionTexture::Size = sizeof(VertexPositionTexture);
-
+const uint32_t VertexPositionTexture::Id = reinterpret_cast<uint32_t>(&VertexPositionTexture::ElementsDesc);
 
 
 uint32_t Mesh::VertexListSize() const

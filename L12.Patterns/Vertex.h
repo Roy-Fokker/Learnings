@@ -16,6 +16,7 @@ namespace Learnings
 		static const uint8_t C_VertexElementCount = 2;
 		static const std::array<D3D11_INPUT_ELEMENT_DESC, C_VertexElementCount> ElementsDesc;
 		static const uint32_t Size;
+		static const uint32_t Id;
 	};
 
 	struct Mesh
@@ -31,4 +32,5 @@ namespace Learnings
 
 		static uint32_t VertexStride();
 	};
+
 }

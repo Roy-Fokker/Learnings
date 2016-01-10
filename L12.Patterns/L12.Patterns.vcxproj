@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AssetManagers.h" />
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Main.h" />
@@ -158,6 +159,7 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AssetManagers.cpp" />
     <ClCompile Include="Direct3D.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />

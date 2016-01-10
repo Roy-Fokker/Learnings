@@ -10,6 +10,7 @@
 namespace Learnings
 {
 	class RenderTarget;
+	class ShaderManager;
 
 	class Game
 	{
@@ -27,9 +28,11 @@ namespace Learnings
 		void Update();
 		void Draw();
 
-		GraphicsDevice::VertexShader vs;
+		/*GraphicsDevice::VertexShader vs;
 		GraphicsDevice::PixelShader ps;
-		GraphicsDevice::InputLayout il;
+		GraphicsDevice::InputLayout il;*/
+		uint32_t m_ShaderKey;
+
 		GraphicsDevice::ShaderResourceView srv;
 
 		GraphicsDevice::Buffer vb, ib;
@@ -41,6 +44,8 @@ namespace Learnings
 
 		std::unique_ptr<GraphicsDevice> m_GfxDev;
 		std::unique_ptr<RenderTarget> m_RT;
+
+		std::unique_ptr<ShaderManager> m_Shaders;
 
 		bool m_Exit;
 	};

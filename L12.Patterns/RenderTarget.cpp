@@ -16,6 +16,8 @@ RenderTarget::RenderTarget(GraphicsDevice::Context context, GraphicsDevice::Rend
 {
 	if (m_Context->GetType() == D3D11_DEVICE_CONTEXT_DEFERRED)
 		m_ContextType = Type::Deferred;
+
+
 }
 
 RenderTarget::~RenderTarget()
@@ -40,6 +42,12 @@ void RenderTarget::Clear(const std::array<float, 4u>& color)
 {
 	m_Context->ClearRenderTargetView(m_RTV, color.data());
 	m_Context->ClearDepthStencilView(m_DSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+}
+
+void RenderTarget::SetView()
+{
+	m_Context->OMSetRenderTargets(1, &(m_RTV.p), m_DSV);
+	m_Context->RSSetViewports(1, &m_Viewport);
 }
 
 void RenderTarget::SetInputType(GraphicsDevice::InputLayout il, D3D11_PRIMITIVE_TOPOLOGY tp)
@@ -89,12 +97,9 @@ void RenderTarget::SetStates(GraphicsDevice::BlendState bs, GraphicsDevice::Dept
 	{
 		m_Context->PSSetSamplers(0, 1, &(ss.p));
 	}
-
-	m_Context->OMSetRenderTargets(1, &(m_RTV.p), m_DSV);
-	m_Context->RSSetViewports(1, &m_Viewport);
 }
 
-void RenderTarget::SetConstantBuffers(const std::vector< std::tuple<Stage, GraphicsDevice::Buffer, uint16_t> > &buffers)
+void RenderTarget::SetConstantBuffers(const ConstantBufferList &buffers)
 {
 	for (auto &buffer : buffers)
 	{
@@ -116,7 +121,7 @@ void RenderTarget::SetConstantBuffers(const std::vector< std::tuple<Stage, Graph
 	}
 }
 
-void RenderTarget::SetShaderResource(const std::vector< std::tuple<Stage, GraphicsDevice::ShaderResourceView, uint16_t> > &resources)
+void RenderTarget::SetShaderResource(const ShaderResourceList &resources)
 {
 	for (auto &resource : resources)
 	{

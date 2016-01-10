@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Services.h"
 #include "Direct3D.h"
 
 namespace Learnings
@@ -36,6 +35,7 @@ namespace Learnings
 
 		void Clear(const std::array<float, 4u> &color);
 
+		void SetView();
 		void SetInputType(GraphicsDevice::InputLayout il, D3D11_PRIMITIVE_TOPOLOGY tp);
 		void SetShader(GraphicsDevice::VertexShader vs, GraphicsDevice::PixelShader ps);
 		void SetStates(GraphicsDevice::BlendState bs, GraphicsDevice::DepthStencilState ds, GraphicsDevice::RasterizerState rs, GraphicsDevice::SamplerState ss);
